@@ -266,6 +266,89 @@
       background: #FDF6F3;
     }
 
+    .message-actions button.primary-action {
+      border-color: var(--claude-orange);
+      background: var(--claude-orange);
+      color: white;
+    }
+
+    .message-actions button.primary-action:hover {
+      opacity: 0.9;
+      background: var(--claude-orange);
+      color: white;
+    }
+
+    /* ── Changes preview ── */
+    .changes-preview {
+      margin-top: 8px;
+      border: 1px solid var(--claude-border);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 12px;
+    }
+
+    .changes-preview .changes-header {
+      background: var(--claude-hover);
+      padding: 6px 10px;
+      font-weight: 600;
+      font-size: 11.5px;
+      color: var(--claude-text-secondary);
+      border-bottom: 1px solid var(--claude-border);
+    }
+
+    .change-item {
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--claude-border);
+    }
+
+    .change-item:last-child { border-bottom: none; }
+
+    .change-item .change-old {
+      background: #FEE2E2;
+      color: #991B1B;
+      padding: 2px 4px;
+      border-radius: 3px;
+      text-decoration: line-through;
+    }
+
+    .change-item .change-new {
+      background: #DCFCE7;
+      color: #166534;
+      padding: 2px 4px;
+      border-radius: 3px;
+    }
+
+    .change-item .change-arrow {
+      color: var(--claude-text-secondary);
+      margin: 0 4px;
+    }
+
+    /* ── Status messages ── */
+    .status-msg {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .status-msg.success {
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      color: #166534;
+    }
+
+    .status-msg.error {
+      background: #FEF2F2;
+      border: 1px solid #FECACA;
+      color: #B91C1C;
+    }
+
+    .status-msg.info {
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      color: #1E40AF;
+    }
+
     /* ── Typing indicator ── */
     .typing-indicator {
       display: none;
@@ -442,17 +525,6 @@
     }
 
     .welcome p { font-size: 12.5px; line-height: 1.5; }
-
-    /* ── Error ── */
-    .error-msg {
-      background: #FEF2F2;
-      border: 1px solid #FECACA;
-      color: #B91C1C;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      margin-top: 4px;
-    }
   </style>
 </head>
 <body>
@@ -481,7 +553,7 @@
       <span class="title">Claude for Word</span>
       <div class="actions">
         <button onclick="newChat()" title="New chat">New</button>
-        <button onclick="showSettings()" title="Settings">⚙</button>
+        <button onclick="showSettings()" title="Settings">&#9881;</button>
       </div>
     </div>
 
@@ -492,7 +564,7 @@
           <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg>
         </div>
         <h2>How can I help?</h2>
-        <p>I can read your document, answer questions, write content, fix grammar, translate, and more.</p>
+        <p>I can read and directly edit your document. Ask me to fix grammar, improve style, translate, or rewrite sections.</p>
       </div>
 
       <!-- Typing indicator -->
@@ -508,10 +580,11 @@
 
     <!-- Quick Actions -->
     <div class="quick-actions" id="quick-actions">
-      <button onclick="quickAction('Summarize my document')">Summarize</button>
-      <button onclick="quickAction('Fix grammar and spelling')">Fix Grammar</button>
+      <button onclick="quickAction('Fix grammar and spelling in my document')">Fix Grammar</button>
       <button onclick="quickAction('Improve the writing style')">Improve Style</button>
       <button onclick="quickAction('Translate to French')">Translate</button>
+      <button onclick="quickAction('Summarize my document')">Summarize</button>
+      <button onclick="quickAction('Make it more professional')">Professional</button>
     </div>
 
     <!-- Input -->
@@ -519,7 +592,7 @@
       <div class="input-wrapper">
         <textarea
           id="user-input"
-          placeholder="Ask Claude about your document..."
+          placeholder="Ask Claude to edit your document..."
           rows="1"
           onkeydown="handleKeyDown(event)"
           oninput="autoResize(this)"
@@ -547,23 +620,32 @@
     let isProcessing = false;
     let officeReady = false;
 
-    const SYSTEM_PROMPT = `You are Claude, an AI assistant integrated into Microsoft Word as a sidebar add-in. You help users with their documents.
+    const SYSTEM_PROMPT = `You are Claude, an AI assistant integrated into Microsoft Word as a sidebar add-in. You help users edit their documents directly.
 
-Your capabilities:
-- Read and analyze document content when provided
-- Help write, edit, rewrite, and improve text
-- Fix grammar, spelling, and punctuation
-- Translate text to other languages
-- Summarize documents
-- Answer questions about document content
-- Suggest improvements to structure and clarity
-- Help with formatting suggestions
+IMPORTANT: When the user asks you to edit, fix, improve, translate, or modify text, you MUST respond with a JSON block containing the changes. Use this exact format:
 
-When the user asks you to write, edit, or improve text, provide the text clearly so they can insert it into their document.
-When you suggest changes, be specific about what to change and why.
-Keep responses concise and actionable since you're in a sidebar panel.
+\`\`\`json-changes
+{
+  "changes": [
+    {
+      "find": "exact text to find in the document",
+      "replace": "new text to replace it with"
+    }
+  ],
+  "summary": "Brief description of what was changed"
+}
+\`\`\`
 
-If document content is provided in the conversation, use it to give contextual answers.`;
+Rules for changes:
+- The "find" field must contain the EXACT text as it appears in the document (including any typos, spacing, punctuation)
+- Keep each find/replace pair focused — target specific sentences or paragraphs
+- For grammar fixes, include enough surrounding context in "find" to ensure unique matches
+- You can include multiple change objects in the array
+- After the JSON block, you can add a brief explanation
+
+When the user asks questions about the document (summarize, explain, etc.) WITHOUT requesting edits, respond normally in plain text without the JSON block.
+
+When making corrections to Arabic or RTL text, be especially careful to preserve the exact original text in the "find" field.`;
 
     /* ══════════════════════════════════════
        OFFICE.JS INITIALIZATION
@@ -572,7 +654,6 @@ If document content is provided in the conversation, use it to give contextual a
       officeReady = true;
       console.log('Office.js ready. Host:', info.host);
 
-      // Check for saved API key
       const savedKey = localStorage.getItem('claude_api_key');
       if (savedKey) {
         API_KEY = savedKey;
@@ -610,11 +691,10 @@ If document content is provided in the conversation, use it to give contextual a
     }
 
     /* ══════════════════════════════════════
-       DOCUMENT READING (Office.js)
+       DOCUMENT OPERATIONS (Office.js)
        ══════════════════════════════════════ */
     async function getDocumentContent() {
       if (!officeReady) return '';
-
       return new Promise((resolve) => {
         try {
           Word.run(async (context) => {
@@ -627,7 +707,6 @@ If document content is provided in the conversation, use it to give contextual a
             resolve('');
           });
         } catch (e) {
-          console.warn('Office API error:', e);
           resolve('');
         }
       });
@@ -635,7 +714,6 @@ If document content is provided in the conversation, use it to give contextual a
 
     async function getSelectedText() {
       if (!officeReady) return '';
-
       return new Promise((resolve) => {
         try {
           Word.run(async (context) => {
@@ -650,9 +728,79 @@ If document content is provided in the conversation, use it to give contextual a
       });
     }
 
+    async function applyChangesToDocument(changes) {
+      if (!officeReady || !changes || changes.length === 0) return { applied: 0, failed: 0 };
+
+      let applied = 0;
+      let failed = 0;
+      let failedItems = [];
+
+      for (const change of changes) {
+        try {
+          const success = await new Promise((resolve) => {
+            Word.run(async (context) => {
+              // Enable track changes
+              try {
+                context.document.load('changeTrackingMode');
+                await context.sync();
+                context.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll;
+                await context.sync();
+              } catch (e) {
+                // Track changes might not be supported, continue anyway
+                console.log('Track changes not supported, applying directly');
+              }
+
+              // Search for the text
+              const body = context.document.body;
+              const searchResults = body.search(change.find, {
+                matchCase: false,
+                matchWholeWord: false
+              });
+              searchResults.load('items');
+              await context.sync();
+
+              if (searchResults.items.length > 0) {
+                // Replace the first match
+                searchResults.items[0].insertText(change.replace, Word.InsertLocation.replace);
+                await context.sync();
+                resolve(true);
+              } else {
+                // Try with trimmed text (sometimes whitespace differs)
+                const trimmedSearch = body.search(change.find.trim(), {
+                  matchCase: false,
+                  matchWholeWord: false
+                });
+                trimmedSearch.load('items');
+                await context.sync();
+
+                if (trimmedSearch.items.length > 0) {
+                  trimmedSearch.items[0].insertText(change.replace, Word.InsertLocation.replace);
+                  await context.sync();
+                  resolve(true);
+                } else {
+                  resolve(false);
+                }
+              }
+            }).catch(() => resolve(false));
+          });
+
+          if (success) {
+            applied++;
+          } else {
+            failed++;
+            failedItems.push(change.find.substring(0, 50) + '...');
+          }
+        } catch (e) {
+          failed++;
+          failedItems.push(change.find.substring(0, 50) + '...');
+        }
+      }
+
+      return { applied, failed, failedItems };
+    }
+
     async function insertTextAtCursor(text) {
       if (!officeReady) return false;
-
       return new Promise((resolve) => {
         try {
           Word.run(async (context) => {
@@ -669,7 +817,6 @@ If document content is provided in the conversation, use it to give contextual a
 
     async function insertTextAtEnd(text) {
       if (!officeReady) return false;
-
       return new Promise((resolve) => {
         try {
           Word.run(async (context) => {
@@ -682,6 +829,28 @@ If document content is provided in the conversation, use it to give contextual a
           resolve(false);
         }
       });
+    }
+
+    /* ══════════════════════════════════════
+       PARSE CLAUDE RESPONSE FOR CHANGES
+       ══════════════════════════════════════ */
+    function parseChangesFromResponse(text) {
+      const jsonMatch = text.match(/```json-changes\s*\n([\s\S]*?)\n```/);
+      if (!jsonMatch) return null;
+
+      try {
+        const parsed = JSON.parse(jsonMatch[1]);
+        if (parsed.changes && Array.isArray(parsed.changes)) {
+          return parsed;
+        }
+      } catch (e) {
+        console.error('Failed to parse changes JSON:', e);
+      }
+      return null;
+    }
+
+    function getTextWithoutChangesBlock(text) {
+      return text.replace(/```json-changes\s*\n[\s\S]*?\n```/, '').trim();
     }
 
     /* ══════════════════════════════════════
@@ -707,7 +876,6 @@ If document content is provided in the conversation, use it to give contextual a
     function newChat() {
       conversationHistory = [];
       const messages = document.getElementById('chat-messages');
-      // Keep welcome and typing indicator, remove everything else
       const welcome = messages.querySelector('.welcome');
       const typing = document.getElementById('typing-indicator');
       messages.innerHTML = '';
@@ -732,23 +900,23 @@ If document content is provided in the conversation, use it to give contextual a
       if (welcome) welcome.style.display = 'none';
       document.getElementById('quick-actions').style.display = 'none';
 
-      // Get document context if checkbox is checked
+      // Get document context
       let docContext = '';
       const includeDoc = document.getElementById('include-doc').checked;
-      if (includeDoc && conversationHistory.length === 0) {
+      if (includeDoc) {
         docContext = await getDocumentContent();
       }
 
-      // Also check for selected text
+      // Check for selected text
       const selectedText = await getSelectedText();
 
       // Build the user message
       let fullMessage = text;
       if (selectedText) {
-        fullMessage = `[Selected text in document]: "${selectedText}"\n\n${text}`;
+        fullMessage = `[Selected text in document]:\n"${selectedText}"\n\n${text}`;
       }
-      if (docContext && conversationHistory.length === 0) {
-        fullMessage = `[Full document content]:\n${docContext}\n\n---\n\n${text}`;
+      if (docContext) {
+        fullMessage = `[Current document content]:\n${docContext}\n\n---\n\n${text}`;
       }
 
       // Add user message to UI
@@ -763,11 +931,23 @@ If document content is provided in the conversation, use it to give contextual a
       try {
         const response = await callClaudeAPI();
         showTyping(false);
-        addMessageToUI('assistant', response, true);
+
+        // Check if response contains document changes
+        const changesData = parseChangesFromResponse(response);
+
+        if (changesData) {
+          // Show the changes preview and apply button
+          const explanation = getTextWithoutChangesBlock(response);
+          addChangesMessageToUI(changesData, explanation, response);
+        } else {
+          // Regular text response
+          addMessageToUI('assistant', response, true);
+        }
+
         conversationHistory.push({ role: 'assistant', content: response });
       } catch (error) {
         showTyping(false);
-        addErrorToUI(error.message || 'Something went wrong. Please try again.');
+        addStatusToUI('error', error.message || 'Something went wrong. Please try again.');
       }
 
       isProcessing = false;
@@ -835,7 +1015,6 @@ If document content is provided in the conversation, use it to give contextual a
       content.appendChild(sender);
       content.appendChild(textEl);
 
-      // Add action buttons for assistant messages
       if (includeActions && role === 'assistant') {
         const actions = document.createElement('div');
         actions.className = 'message-actions';
@@ -857,17 +1036,8 @@ If document content is provided in the conversation, use it to give contextual a
           setTimeout(() => insertBtn.textContent = 'Insert at cursor', 1500);
         };
 
-        const appendBtn = document.createElement('button');
-        appendBtn.textContent = 'Add to end';
-        appendBtn.onclick = async () => {
-          const success = await insertTextAtEnd(text);
-          appendBtn.textContent = success ? 'Added!' : 'Failed';
-          setTimeout(() => appendBtn.textContent = 'Add to end', 1500);
-        };
-
         actions.appendChild(copyBtn);
         actions.appendChild(insertBtn);
-        actions.appendChild(appendBtn);
         content.appendChild(actions);
       }
 
@@ -878,15 +1048,120 @@ If document content is provided in the conversation, use it to give contextual a
       container.scrollTop = container.scrollHeight;
     }
 
-    function addErrorToUI(message) {
+    function addChangesMessageToUI(changesData, explanation, fullResponse) {
       const container = document.getElementById('chat-messages');
       const typing = document.getElementById('typing-indicator');
 
-      const errorDiv = document.createElement('div');
-      errorDiv.className = 'error-msg';
-      errorDiv.textContent = message;
+      const msg = document.createElement('div');
+      msg.className = 'message assistant';
 
-      container.insertBefore(errorDiv, typing);
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.textContent = 'C';
+
+      const content = document.createElement('div');
+      content.className = 'content';
+
+      const sender = document.createElement('div');
+      sender.className = 'sender';
+      sender.textContent = 'Claude';
+
+      content.appendChild(sender);
+
+      // Summary text
+      if (changesData.summary) {
+        const summaryEl = document.createElement('div');
+        summaryEl.className = 'text';
+        summaryEl.textContent = changesData.summary;
+        content.appendChild(summaryEl);
+      }
+
+      // Changes preview
+      const preview = document.createElement('div');
+      preview.className = 'changes-preview';
+
+      const header = document.createElement('div');
+      header.className = 'changes-header';
+      header.textContent = `${changesData.changes.length} change${changesData.changes.length > 1 ? 's' : ''} to apply`;
+      preview.appendChild(header);
+
+      changesData.changes.forEach((change, i) => {
+        const item = document.createElement('div');
+        item.className = 'change-item';
+
+        const findText = change.find.length > 80 ? change.find.substring(0, 80) + '...' : change.find;
+        const replaceText = change.replace.length > 80 ? change.replace.substring(0, 80) + '...' : change.replace;
+
+        item.innerHTML = `<span class="change-old">${escapeHtml(findText)}</span>` +
+          `<span class="change-arrow"> → </span>` +
+          `<span class="change-new">${escapeHtml(replaceText)}</span>`;
+        preview.appendChild(item);
+      });
+
+      content.appendChild(preview);
+
+      // Action buttons
+      const actions = document.createElement('div');
+      actions.className = 'message-actions';
+
+      const applyBtn = document.createElement('button');
+      applyBtn.className = 'primary-action';
+      applyBtn.textContent = 'Apply Changes';
+      applyBtn.onclick = async () => {
+        applyBtn.textContent = 'Applying...';
+        applyBtn.disabled = true;
+
+        const result = await applyChangesToDocument(changesData.changes);
+
+        if (result.applied > 0 && result.failed === 0) {
+          addStatusToUI('success', `All ${result.applied} change${result.applied > 1 ? 's' : ''} applied successfully! Review them in your document.`);
+        } else if (result.applied > 0 && result.failed > 0) {
+          addStatusToUI('info', `Applied ${result.applied} change${result.applied > 1 ? 's' : ''}. ${result.failed} could not be matched in the document.`);
+        } else {
+          addStatusToUI('error', `Could not find the text to replace. The document may have changed. Try again.`);
+        }
+
+        applyBtn.textContent = 'Applied';
+      };
+
+      const copyBtn = document.createElement('button');
+      copyBtn.textContent = 'Copy response';
+      copyBtn.onclick = () => {
+        navigator.clipboard.writeText(fullResponse).then(() => {
+          copyBtn.textContent = 'Copied!';
+          setTimeout(() => copyBtn.textContent = 'Copy response', 1500);
+        });
+      };
+
+      actions.appendChild(applyBtn);
+      actions.appendChild(copyBtn);
+      content.appendChild(actions);
+
+      // Explanation text
+      if (explanation) {
+        const explEl = document.createElement('div');
+        explEl.className = 'text';
+        explEl.style.marginTop = '8px';
+        explEl.innerHTML = formatMarkdown(explanation);
+        content.appendChild(explEl);
+      }
+
+      msg.appendChild(avatar);
+      msg.appendChild(content);
+
+      container.insertBefore(msg, typing);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function addStatusToUI(type, message) {
+      const container = document.getElementById('chat-messages');
+      const typing = document.getElementById('typing-indicator');
+
+      const statusDiv = document.createElement('div');
+      statusDiv.className = `status-msg ${type}`;
+      statusDiv.textContent = message;
+
+      container.insertBefore(statusDiv, typing);
       container.scrollTop = container.scrollHeight;
     }
 
@@ -900,24 +1175,12 @@ If document content is provided in the conversation, use it to give contextual a
     }
 
     function formatMarkdown(text) {
-      // Simple markdown formatting
       let html = escapeHtml(text);
-
-      // Code blocks
       html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-
-      // Inline code
       html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-      // Bold
       html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-      // Italic
       html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-
-      // Line breaks
       html = html.replace(/\n/g, '<br>');
-
       return html;
     }
 
