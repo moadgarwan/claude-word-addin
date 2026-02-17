@@ -7,1188 +7,476 @@
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
     :root {
-      --claude-orange: #D97757;
-      --claude-bg: #FAF9F7;
-      --claude-sidebar: #F5F4F0;
-      --claude-text: #1A1A1A;
-      --claude-text-secondary: #6B6560;
-      --claude-border: #E8E5E0;
-      --claude-user-bg: #F0EFEB;
-      --claude-assistant-bg: #FFFFFF;
-      --claude-input-bg: #FFFFFF;
-      --claude-hover: #EEEDEA;
+      --claude-orange: #4285F4; --claude-bg: #FAF9F7; --claude-text: #1A1A1A;
+      --claude-text-secondary: #6B6560; --claude-border: #E8E5E0;
+      --claude-user-bg: #F0EFEB; --claude-assistant-bg: #FFFFFF; --claude-hover: #EEEDEA;
     }
-
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--claude-bg);
-      color: var(--claude-text);
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    /* ── Setup Screen ── */
-    #setup-screen {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      padding: 24px;
-      text-align: center;
-    }
-
-    #setup-screen .logo {
-      width: 48px;
-      height: 48px;
-      background: var(--claude-orange);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 16px;
-    }
-
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--claude-bg); color: var(--claude-text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 13px; line-height: 1.5; }
+    #setup-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 24px; text-align: center; }
+    #setup-screen .logo { width: 48px; height: 48px; background: var(--claude-orange); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
     #setup-screen .logo svg { width: 28px; height: 28px; }
-
-    #setup-screen h1 {
-      font-size: 18px;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    #setup-screen p {
-      color: var(--claude-text-secondary);
-      font-size: 12.5px;
-      margin-bottom: 20px;
-      max-width: 260px;
-    }
-
-    #setup-screen input {
-      width: 100%;
-      max-width: 300px;
-      padding: 10px 14px;
-      border: 1.5px solid var(--claude-border);
-      border-radius: 8px;
-      font-size: 13px;
-      outline: none;
-      background: var(--claude-input-bg);
-      transition: border-color 0.2s;
-    }
-
+    #setup-screen h1 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    #setup-screen p { color: var(--claude-text-secondary); font-size: 12.5px; margin-bottom: 20px; max-width: 260px; }
+    #setup-screen input { width: 100%; max-width: 300px; padding: 10px 14px; border: 1.5px solid var(--claude-border); border-radius: 8px; font-size: 13px; outline: none; }
     #setup-screen input:focus { border-color: var(--claude-orange); }
+    #setup-screen .btn-primary { margin-top: 12px; width: 100%; max-width: 300px; padding: 10px; background: var(--claude-orange); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    #setup-screen .hint { margin-top: 12px; font-size: 11px; color: var(--claude-text-secondary); }
+    #setup-screen .hint a { color: var(--claude-orange); text-decoration: none; }
 
-    #setup-screen .btn-primary {
-      margin-top: 12px;
-      width: 100%;
-      max-width: 300px;
-      padding: 10px;
-      background: var(--claude-orange);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: opacity 0.2s;
-    }
-
-    #setup-screen .btn-primary:hover { opacity: 0.9; }
-
-    #setup-screen .hint {
-      margin-top: 12px;
-      font-size: 11px;
-      color: var(--claude-text-secondary);
-    }
-
-    #setup-screen .hint a {
-      color: var(--claude-orange);
-      text-decoration: none;
-    }
-
-    /* ── Header ── */
-    .header {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 16px;
-      border-bottom: 1px solid var(--claude-border);
-      background: var(--claude-assistant-bg);
-      flex-shrink: 0;
-    }
-
-    .header .logo-small {
-      width: 28px;
-      height: 28px;
-      background: var(--claude-orange);
-      border-radius: 7px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-
+    .header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--claude-border); background: var(--claude-assistant-bg); flex-shrink: 0; }
+    .header .logo-small { width: 28px; height: 28px; background: var(--claude-orange); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .header .logo-small svg { width: 16px; height: 16px; }
-
-    .header .title {
-      font-weight: 600;
-      font-size: 14px;
-      flex: 1;
-    }
-
+    .header .title { font-weight: 600; font-size: 14px; flex: 1; }
     .header .actions { display: flex; gap: 4px; }
+    .header .actions button { background: none; border: none; padding: 4px 6px; border-radius: 6px; cursor: pointer; color: var(--claude-text-secondary); font-size: 12px; }
+    .header .actions button:hover { background: var(--claude-hover); }
 
-    .header .actions button {
-      background: none;
-      border: none;
-      padding: 4px 6px;
-      border-radius: 6px;
-      cursor: pointer;
-      color: var(--claude-text-secondary);
-      font-size: 12px;
-      transition: background 0.15s;
-    }
-
-    .header .actions button:hover {
-      background: var(--claude-hover);
-      color: var(--claude-text);
-    }
-
-    /* ── Chat Area ── */
     #chat-screen { display: none; flex-direction: column; height: 100vh; }
+    .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+    .message { display: flex; gap: 10px; }
+    .message .avatar { width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; margin-top: 2px; }
+    .message.user .avatar { background: var(--claude-user-bg); color: var(--claude-text-secondary); }
+    .message.assistant .avatar { background: var(--claude-orange); color: white; }
+    .message .content { flex: 1; min-width: 0; }
+    .message .sender { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+    .message .text { font-size: 13px; line-height: 1.55; word-wrap: break-word; white-space: pre-wrap; }
+    .message .text code { background: var(--claude-hover); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+    .message .text pre { background: #2D2D2D; color: #E6E6E6; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; font-size: 12px; }
 
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
+    .message-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
+    .message-actions button { padding: 5px 10px; border: 1px solid var(--claude-border); background: var(--claude-assistant-bg); border-radius: 6px; font-size: 11.5px; cursor: pointer; color: var(--claude-text-secondary); }
+    .message-actions button:hover { border-color: var(--claude-orange); color: var(--claude-orange); }
+    .message-actions button.primary-action { border-color: var(--claude-orange); background: var(--claude-orange); color: white; }
+    .message-actions button.primary-action:hover { opacity: 0.9; }
 
-    .message {
-      display: flex;
-      gap: 10px;
-      max-width: 100%;
-    }
-
-    .message .avatar {
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: 600;
-      margin-top: 2px;
-    }
-
-    .message.user .avatar {
-      background: var(--claude-user-bg);
-      color: var(--claude-text-secondary);
-    }
-
-    .message.assistant .avatar {
-      background: var(--claude-orange);
-      color: white;
-    }
-
-    .message .content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .message .sender {
-      font-size: 12px;
-      font-weight: 600;
-      margin-bottom: 3px;
-      color: var(--claude-text);
-    }
-
-    .message .text {
-      font-size: 13px;
-      line-height: 1.55;
-      color: var(--claude-text);
-      word-wrap: break-word;
-      white-space: pre-wrap;
-    }
-
-    .message .text code {
-      background: var(--claude-hover);
-      padding: 1px 5px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-    }
-
-    .message .text pre {
-      background: #2D2D2D;
-      color: #E6E6E6;
-      padding: 12px;
-      border-radius: 8px;
-      overflow-x: auto;
-      margin: 8px 0;
-      font-size: 12px;
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      line-height: 1.4;
-    }
-
-    /* ── Action buttons in messages ── */
-    .message-actions {
-      display: flex;
-      gap: 6px;
-      margin-top: 8px;
-      flex-wrap: wrap;
-    }
-
-    .message-actions button {
-      padding: 5px 10px;
-      border: 1px solid var(--claude-border);
-      background: var(--claude-assistant-bg);
-      border-radius: 6px;
-      font-size: 11.5px;
-      cursor: pointer;
-      color: var(--claude-text-secondary);
-      transition: all 0.15s;
-    }
-
-    .message-actions button:hover {
-      border-color: var(--claude-orange);
-      color: var(--claude-orange);
-      background: #FDF6F3;
-    }
-
-    .message-actions button.primary-action {
-      border-color: var(--claude-orange);
-      background: var(--claude-orange);
-      color: white;
-    }
-
-    .message-actions button.primary-action:hover {
-      opacity: 0.9;
-      background: var(--claude-orange);
-      color: white;
-    }
-
-    /* ── Changes preview ── */
-    .changes-preview {
-      margin-top: 8px;
-      border: 1px solid var(--claude-border);
-      border-radius: 8px;
-      overflow: hidden;
-      font-size: 12px;
-    }
-
-    .changes-preview .changes-header {
-      background: var(--claude-hover);
-      padding: 6px 10px;
-      font-weight: 600;
-      font-size: 11.5px;
-      color: var(--claude-text-secondary);
-      border-bottom: 1px solid var(--claude-border);
-    }
-
-    .change-item {
-      padding: 8px 10px;
-      border-bottom: 1px solid var(--claude-border);
-    }
-
+    .changes-preview { margin-top: 8px; border: 1px solid var(--claude-border); border-radius: 8px; overflow: hidden; font-size: 12px; }
+    .changes-preview .changes-header { background: var(--claude-hover); padding: 6px 10px; font-weight: 600; font-size: 11.5px; color: var(--claude-text-secondary); border-bottom: 1px solid var(--claude-border); }
+    .change-item { padding: 8px 10px; border-bottom: 1px solid var(--claude-border); }
     .change-item:last-child { border-bottom: none; }
+    .change-item .change-old { background: #FEE2E2; color: #991B1B; padding: 2px 4px; border-radius: 3px; text-decoration: line-through; }
+    .change-item .change-new { background: #DCFCE7; color: #166534; padding: 2px 4px; border-radius: 3px; }
+    .change-item .change-arrow { color: var(--claude-text-secondary); margin: 0 4px; }
 
-    .change-item .change-old {
-      background: #FEE2E2;
-      color: #991B1B;
-      padding: 2px 4px;
-      border-radius: 3px;
-      text-decoration: line-through;
-    }
+    .status-msg { padding: 8px 12px; border-radius: 8px; font-size: 12px; margin-top: 4px; }
+    .status-msg.success { background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; }
+    .status-msg.error { background: #FEF2F2; border: 1px solid #FECACA; color: #B91C1C; }
+    .status-msg.info { background: #EFF6FF; border: 1px solid #BFDBFE; color: #1E40AF; }
 
-    .change-item .change-new {
-      background: #DCFCE7;
-      color: #166534;
-      padding: 2px 4px;
-      border-radius: 3px;
-    }
-
-    .change-item .change-arrow {
-      color: var(--claude-text-secondary);
-      margin: 0 4px;
-    }
-
-    /* ── Status messages ── */
-    .status-msg {
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 12px;
-      margin-top: 4px;
-    }
-
-    .status-msg.success {
-      background: #F0FDF4;
-      border: 1px solid #BBF7D0;
-      color: #166534;
-    }
-
-    .status-msg.error {
-      background: #FEF2F2;
-      border: 1px solid #FECACA;
-      color: #B91C1C;
-    }
-
-    .status-msg.info {
-      background: #EFF6FF;
-      border: 1px solid #BFDBFE;
-      color: #1E40AF;
-    }
-
-    /* ── Typing indicator ── */
-    .typing-indicator {
-      display: none;
-      gap: 10px;
-      padding: 0;
-    }
-
+    .typing-indicator { display: none; gap: 10px; }
     .typing-indicator.visible { display: flex; }
-
-    .typing-dots {
-      display: flex;
-      gap: 4px;
-      align-items: center;
-      padding-top: 4px;
-    }
-
-    .typing-dots span {
-      width: 6px;
-      height: 6px;
-      background: var(--claude-text-secondary);
-      border-radius: 50%;
-      animation: bounce 1.4s infinite ease-in-out;
-      opacity: 0.4;
-    }
-
+    .typing-dots { display: flex; gap: 4px; align-items: center; padding-top: 4px; }
+    .typing-dots span { width: 6px; height: 6px; background: var(--claude-text-secondary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; opacity: 0.4; }
     .typing-dots span:nth-child(1) { animation-delay: 0s; }
     .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes bounce { 0%,80%,100% { transform: scale(0.8); opacity: 0.4; } 40% { transform: scale(1.2); opacity: 1; } }
 
-    @keyframes bounce {
-      0%, 80%, 100% { transform: scale(0.8); opacity: 0.4; }
-      40% { transform: scale(1.2); opacity: 1; }
-    }
+    .quick-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 8px; flex-shrink: 0; }
+    .quick-actions button { padding: 6px 12px; border: 1px solid var(--claude-border); background: var(--claude-assistant-bg); border-radius: 16px; font-size: 11.5px; cursor: pointer; color: var(--claude-text-secondary); white-space: nowrap; }
+    .quick-actions button:hover { border-color: var(--claude-orange); color: var(--claude-orange); }
 
-    /* ── Quick Actions ── */
-    .quick-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 0 16px 8px;
-      flex-shrink: 0;
-    }
-
-    .quick-actions button {
-      padding: 6px 12px;
-      border: 1px solid var(--claude-border);
-      background: var(--claude-assistant-bg);
-      border-radius: 16px;
-      font-size: 11.5px;
-      cursor: pointer;
-      color: var(--claude-text-secondary);
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-
-    .quick-actions button:hover {
-      border-color: var(--claude-orange);
-      color: var(--claude-orange);
-      background: #FDF6F3;
-    }
-
-    /* ── Input Area ── */
-    .input-area {
-      padding: 12px 16px 16px;
-      border-top: 1px solid var(--claude-border);
-      background: var(--claude-assistant-bg);
-      flex-shrink: 0;
-    }
-
-    .input-wrapper {
-      display: flex;
-      gap: 8px;
-      align-items: flex-end;
-    }
-
-    .input-wrapper textarea {
-      flex: 1;
-      padding: 10px 14px;
-      border: 1.5px solid var(--claude-border);
-      border-radius: 10px;
-      font-size: 13px;
-      font-family: inherit;
-      resize: none;
-      outline: none;
-      min-height: 40px;
-      max-height: 120px;
-      background: var(--claude-bg);
-      transition: border-color 0.2s;
-      line-height: 1.4;
-    }
-
+    .input-area { padding: 12px 16px 16px; border-top: 1px solid var(--claude-border); background: var(--claude-assistant-bg); flex-shrink: 0; }
+    .input-wrapper { display: flex; gap: 8px; align-items: flex-end; }
+    .input-wrapper textarea { flex: 1; padding: 10px 14px; border: 1.5px solid var(--claude-border); border-radius: 10px; font-size: 13px; font-family: inherit; resize: none; outline: none; min-height: 40px; max-height: 120px; background: var(--claude-bg); line-height: 1.4; }
     .input-wrapper textarea:focus { border-color: var(--claude-orange); }
-
-    .input-wrapper .send-btn {
-      width: 36px;
-      height: 36px;
-      background: var(--claude-orange);
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      transition: opacity 0.15s;
-    }
-
-    .input-wrapper .send-btn:hover { opacity: 0.85; }
+    .input-wrapper .send-btn { width: 36px; height: 36px; background: var(--claude-orange); border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .input-wrapper .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .input-wrapper .send-btn svg { width: 16px; height: 16px; fill: white; }
+    .input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding: 0 2px; }
+    .input-footer .context-toggle { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--claude-text-secondary); cursor: pointer; }
+    .input-footer .context-toggle input[type="checkbox"] { accent-color: var(--claude-orange); }
+    .input-footer .model-info { font-size: 10.5px; color: var(--claude-text-secondary); }
 
-    .input-wrapper .send-btn svg {
-      width: 16px;
-      height: 16px;
-      fill: white;
-    }
-
-    .input-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 6px;
-      padding: 0 2px;
-    }
-
-    .input-footer .context-toggle {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 11px;
-      color: var(--claude-text-secondary);
-      cursor: pointer;
-      user-select: none;
-    }
-
-    .input-footer .context-toggle input[type="checkbox"] {
-      accent-color: var(--claude-orange);
-    }
-
-    .input-footer .model-info {
-      font-size: 10.5px;
-      color: var(--claude-text-secondary);
-    }
-
-    /* ── Scrollbar ── */
     .chat-messages::-webkit-scrollbar { width: 5px; }
     .chat-messages::-webkit-scrollbar-track { background: transparent; }
     .chat-messages::-webkit-scrollbar-thumb { background: var(--claude-border); border-radius: 3px; }
 
-    /* ── Welcome message ── */
-    .welcome {
-      text-align: center;
-      padding: 32px 16px;
-      color: var(--claude-text-secondary);
-    }
-
-    .welcome .logo-large {
-      width: 44px;
-      height: 44px;
-      background: var(--claude-orange);
-      border-radius: 11px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 12px;
-    }
-
+    .welcome { text-align: center; padding: 32px 16px; color: var(--claude-text-secondary); }
+    .welcome .logo-large { width: 44px; height: 44px; background: var(--claude-orange); border-radius: 11px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
     .welcome .logo-large svg { width: 24px; height: 24px; }
-
-    .welcome h2 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--claude-text);
-      margin-bottom: 6px;
-    }
-
-    .welcome p { font-size: 12.5px; line-height: 1.5; }
+    .welcome h2 { font-size: 16px; font-weight: 600; color: var(--claude-text); margin-bottom: 6px; }
+    .welcome p { font-size: 12.5px; }
   </style>
 </head>
 <body>
 
-  <!-- ═══════ SETUP SCREEN ═══════ -->
   <div id="setup-screen">
-    <div class="logo">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/>
-      </svg>
-    </div>
-    <h1>Claude for Word</h1>
-    <p>Enter your Anthropic API key to start chatting with Claude about your documents.</p>
-    <input type="password" id="api-key-input" placeholder="sk-ant-api03-..." />
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
+    <h1>Gemini for Word</h1>
+    <p>Enter your Google AI API key to start chatting with Gemini about your documents.</p>
+    <input type="password" id="api-key-input" placeholder="AIza..." />
     <button class="btn-primary" onclick="saveApiKey()">Get Started</button>
-    <p class="hint">Get your API key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+    <p class="hint">Get your API key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a></p>
   </div>
 
-  <!-- ═══════ CHAT SCREEN ═══════ -->
   <div id="chat-screen">
-    <!-- Header -->
     <div class="header">
-      <div class="logo-small">
-        <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg>
-      </div>
-      <span class="title">Claude for Word</span>
+      <div class="logo-small"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
+      <span class="title">Gemini for Word</span>
       <div class="actions">
-        <button onclick="newChat()" title="New chat">New</button>
-        <button onclick="showSettings()" title="Settings">&#9881;</button>
+        <button onclick="newChat()">New</button>
+        <button onclick="showSettings()">&#9881;</button>
       </div>
     </div>
 
-    <!-- Messages -->
     <div class="chat-messages" id="chat-messages">
       <div class="welcome">
-        <div class="logo-large">
-          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg>
-        </div>
+        <div class="logo-large"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
         <h2>How can I help?</h2>
-        <p>I can read and directly edit your document. Ask me to fix grammar, improve style, translate, or rewrite sections.</p>
+        <p>I can read and directly edit your document. Ask me to fix grammar, improve style, translate, or rewrite.</p>
       </div>
-
-      <!-- Typing indicator -->
       <div class="typing-indicator message assistant" id="typing-indicator">
-        <div class="avatar">C</div>
-        <div class="content">
-          <div class="typing-dots">
-            <span></span><span></span><span></span>
-          </div>
-        </div>
+        <div class="avatar">G</div>
+        <div class="content"><div class="typing-dots"><span></span><span></span><span></span></div></div>
       </div>
     </div>
 
-    <!-- Quick Actions -->
     <div class="quick-actions" id="quick-actions">
-      <button onclick="quickAction('Fix grammar and spelling in my document')">Fix Grammar</button>
-      <button onclick="quickAction('Improve the writing style')">Improve Style</button>
+      <button onclick="quickAction('Fix grammar and spelling')">Fix Grammar</button>
+      <button onclick="quickAction('Improve writing style')">Improve Style</button>
       <button onclick="quickAction('Translate to French')">Translate</button>
-      <button onclick="quickAction('Summarize my document')">Summarize</button>
-      <button onclick="quickAction('Make it more professional')">Professional</button>
+      <button onclick="quickAction('Summarize')">Summarize</button>
     </div>
 
-    <!-- Input -->
     <div class="input-area">
       <div class="input-wrapper">
-        <textarea
-          id="user-input"
-          placeholder="Ask Claude to edit your document..."
-          rows="1"
-          onkeydown="handleKeyDown(event)"
-          oninput="autoResize(this)"
-        ></textarea>
-        <button class="send-btn" id="send-btn" onclick="sendMessage()">
-          <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
-        </button>
+        <textarea id="user-input" placeholder="Ask Gemini to edit your document..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
       </div>
       <div class="input-footer">
-        <label class="context-toggle">
-          <input type="checkbox" id="include-doc" checked />
-          Include document context
-        </label>
-        <span class="model-info">Claude Sonnet 4.5</span>
+        <label class="context-toggle"><input type="checkbox" id="include-doc" checked /> Include document</label>
+        <span class="model-info">Gemini 3 Flash</span>
       </div>
     </div>
   </div>
 
   <script>
-    /* ══════════════════════════════════════
-       STATE & CONFIG
-       ══════════════════════════════════════ */
-    let API_KEY = '';
-    let conversationHistory = [];
-    let isProcessing = false;
-    let officeReady = false;
+    let API_KEY = '', conversationHistory = [], isProcessing = false, officeReady = false;
 
-    const SYSTEM_PROMPT = `You are Claude, an AI assistant integrated into Microsoft Word as a sidebar add-in. You help users edit their documents directly.
+    const SYSTEM_PROMPT = `You are Gemini, an AI assistant in Microsoft Word. You edit documents directly.
 
-IMPORTANT: When the user asks you to edit, fix, improve, translate, or modify text, you MUST respond with a JSON block containing the changes. Use this exact format:
+When asked to edit/fix/improve/translate text, respond with JSON changes:
 
 \`\`\`json-changes
 {
   "changes": [
-    {
-      "find": "exact text to find in the document",
-      "replace": "new text to replace it with"
-    }
+    {"find": "exact text from doc", "replace": "corrected text"}
   ],
-  "summary": "Brief description of what was changed"
+  "summary": "What was changed"
 }
 \`\`\`
 
-Rules for changes:
-- The "find" field must contain the EXACT text as it appears in the document (including any typos, spacing, punctuation)
-- Keep each find/replace pair focused — target specific sentences or paragraphs
-- For grammar fixes, include enough surrounding context in "find" to ensure unique matches
-- You can include multiple change objects in the array
-- After the JSON block, you can add a brief explanation
+CRITICAL RULES FOR "find" VALUES:
+1. Copy the EXACT text from the document content I provide — character for character
+2. Keep each "find" SHORT: target only the specific wrong word(s) plus 2-3 surrounding words for uniqueness (ideally 10-40 characters)
+3. Each "find" must be unique in the document
+4. One fix per change entry — don't combine multiple errors
+5. For Arabic text: copy exact characters from the provided document text, never retype
+6. DO NOT include line breaks or paragraph breaks in "find" values
+7. If a word appears multiple times, include the minimum surrounding context to make it unique
 
-When the user asks questions about the document (summarize, explain, etc.) WITHOUT requesting edits, respond normally in plain text without the JSON block.
+GOOD example:
+{"find": "teh quick brown", "replace": "the quick brown"}
 
-When making corrections to Arabic or RTL text, be especially careful to preserve the exact original text in the "find" field.`;
+BAD example (too long):
+{"find": "The quick brown fox jumped over the lazy dog and then ran away into the forest", "replace": "..."}
 
-    /* ══════════════════════════════════════
-       OFFICE.JS INITIALIZATION
-       ══════════════════════════════════════ */
-    Office.onReady(function(info) {
+For questions (summarize, explain) without editing, respond normally without JSON.`;
+
+    Office.onReady(function() {
       officeReady = true;
-      console.log('Office.js ready. Host:', info.host);
-
-      const savedKey = localStorage.getItem('claude_api_key');
-      if (savedKey) {
-        API_KEY = savedKey;
-        showChatScreen();
-      }
+      const k = localStorage.getItem('gemini_api_key');
+      if (k) { API_KEY = k; showChatScreen(); }
     });
 
-    /* ══════════════════════════════════════
-       SETUP / API KEY
-       ══════════════════════════════════════ */
-    function saveApiKey() {
-      const key = document.getElementById('api-key-input').value.trim();
-      if (!key) return;
-      API_KEY = key;
-      localStorage.setItem('claude_api_key', key);
-      showChatScreen();
-    }
+    function saveApiKey() { const k = document.getElementById('api-key-input').value.trim(); if (!k) return; API_KEY = k; localStorage.setItem('gemini_api_key', k); showChatScreen(); }
+    function showChatScreen() { document.getElementById('setup-screen').style.display = 'none'; document.getElementById('chat-screen').style.display = 'flex'; document.getElementById('user-input').focus(); }
+    function showSettings() { const k = prompt('Enter Google AI API key:'); if (k) { API_KEY = k.trim(); localStorage.setItem('gemini_api_key', API_KEY); } }
 
-    function showChatScreen() {
-      document.getElementById('setup-screen').style.display = 'none';
-      document.getElementById('chat-screen').style.display = 'flex';
-      document.getElementById('user-input').focus();
-    }
-
-    function showSettings() {
-      const action = confirm('Do you want to update your API key?\n\nClick OK to enter a new key, or Cancel to go back.');
-      if (action) {
-        const newKey = prompt('Enter your Anthropic API key:', '');
-        if (newKey && newKey.trim()) {
-          API_KEY = newKey.trim();
-          localStorage.setItem('claude_api_key', API_KEY);
-          alert('API key updated!');
-        }
-      }
-    }
-
-    /* ══════════════════════════════════════
-       DOCUMENT OPERATIONS (Office.js)
-       ══════════════════════════════════════ */
+    /* ── Document Operations ── */
     async function getDocumentContent() {
       if (!officeReady) return '';
-      return new Promise((resolve) => {
-        try {
-          Word.run(async (context) => {
-            const body = context.document.body;
-            body.load('text');
-            await context.sync();
-            resolve(body.text || '');
-          }).catch((err) => {
-            console.warn('Could not read document:', err);
-            resolve('');
-          });
-        } catch (e) {
-          resolve('');
-        }
+      return new Promise(r => {
+        Word.run(async ctx => { const b = ctx.document.body; b.load('text'); await ctx.sync(); r(b.text || ''); }).catch(() => r(''));
       });
     }
 
     async function getSelectedText() {
       if (!officeReady) return '';
-      return new Promise((resolve) => {
-        try {
-          Word.run(async (context) => {
-            const selection = context.document.getSelection();
-            selection.load('text');
-            await context.sync();
-            resolve(selection.text || '');
-          }).catch(() => resolve(''));
-        } catch (e) {
-          resolve('');
-        }
+      return new Promise(r => {
+        Word.run(async ctx => { const s = ctx.document.getSelection(); s.load('text'); await ctx.sync(); r(s.text || ''); }).catch(() => r(''));
+      });
+    }
+
+    async function replaceTextInDocument(findText, replaceText) {
+      if (!officeReady) return false;
+      return new Promise(resolve => {
+        Word.run(async ctx => {
+          try { ctx.document.load('changeTrackingMode'); await ctx.sync(); ctx.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll; await ctx.sync(); } catch(e) {}
+
+          const body = ctx.document.body;
+
+          // Strategy 1: Exact match
+          let sr = body.search(findText, { matchCase: true, matchWholeWord: false });
+          sr.load('items'); await ctx.sync();
+          if (sr.items.length > 0) { sr.items[0].insertText(replaceText, Word.InsertLocation.replace); await ctx.sync(); resolve(true); return; }
+
+          // Strategy 2: Case insensitive
+          sr = body.search(findText, { matchCase: false, matchWholeWord: false });
+          sr.load('items'); await ctx.sync();
+          if (sr.items.length > 0) { sr.items[0].insertText(replaceText, Word.InsertLocation.replace); await ctx.sync(); resolve(true); return; }
+
+          // Strategy 3: Trimmed
+          const t = findText.trim();
+          if (t !== findText) {
+            sr = body.search(t, { matchCase: false }); sr.load('items'); await ctx.sync();
+            if (sr.items.length > 0) { sr.items[0].insertText(replaceText, Word.InsertLocation.replace); await ctx.sync(); resolve(true); return; }
+          }
+
+          // Strategy 4: Paragraph-level text replacement (handles Arabic and complex text)
+          try {
+            const paragraphs = body.paragraphs;
+            paragraphs.load('items'); await ctx.sync();
+            for (let i = 0; i < paragraphs.items.length; i++) {
+              const p = paragraphs.items[i];
+              p.load('text'); await ctx.sync();
+              if (p.text && p.text.includes(findText)) {
+                const newText = p.text.replace(findText, replaceText);
+                p.insertText(newText, Word.InsertLocation.replace);
+                await ctx.sync();
+                resolve(true);
+                return;
+              }
+            }
+          } catch(e) {}
+
+          // Strategy 5: Normalized comparison (remove extra spaces)
+          try {
+            const paragraphs = body.paragraphs;
+            paragraphs.load('items'); await ctx.sync();
+            const normalizedFind = findText.replace(/\s+/g, ' ').trim();
+            for (let i = 0; i < paragraphs.items.length; i++) {
+              const p = paragraphs.items[i];
+              p.load('text'); await ctx.sync();
+              if (p.text) {
+                const normalizedPara = p.text.replace(/\s+/g, ' ').trim();
+                if (normalizedPara.includes(normalizedFind)) {
+                  const idx = normalizedPara.indexOf(normalizedFind);
+                  const newText = normalizedPara.substring(0, idx) + replaceText + normalizedPara.substring(idx + normalizedFind.length);
+                  p.insertText(newText, Word.InsertLocation.replace);
+                  await ctx.sync();
+                  resolve(true);
+                  return;
+                }
+              }
+            }
+          } catch(e) {}
+
+          resolve(false);
+        }).catch(() => resolve(false));
       });
     }
 
     async function applyChangesToDocument(changes) {
-      if (!officeReady || !changes || changes.length === 0) return { applied: 0, failed: 0 };
-
-      let applied = 0;
-      let failed = 0;
-      let failedItems = [];
-
-      for (const change of changes) {
-        try {
-          const success = await new Promise((resolve) => {
-            Word.run(async (context) => {
-              // Enable track changes
-              try {
-                context.document.load('changeTrackingMode');
-                await context.sync();
-                context.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll;
-                await context.sync();
-              } catch (e) {
-                // Track changes might not be supported, continue anyway
-                console.log('Track changes not supported, applying directly');
-              }
-
-              // Search for the text
-              const body = context.document.body;
-              const searchResults = body.search(change.find, {
-                matchCase: false,
-                matchWholeWord: false
-              });
-              searchResults.load('items');
-              await context.sync();
-
-              if (searchResults.items.length > 0) {
-                // Replace the first match
-                searchResults.items[0].insertText(change.replace, Word.InsertLocation.replace);
-                await context.sync();
-                resolve(true);
-              } else {
-                // Try with trimmed text (sometimes whitespace differs)
-                const trimmedSearch = body.search(change.find.trim(), {
-                  matchCase: false,
-                  matchWholeWord: false
-                });
-                trimmedSearch.load('items');
-                await context.sync();
-
-                if (trimmedSearch.items.length > 0) {
-                  trimmedSearch.items[0].insertText(change.replace, Word.InsertLocation.replace);
-                  await context.sync();
-                  resolve(true);
-                } else {
-                  resolve(false);
-                }
-              }
-            }).catch(() => resolve(false));
-          });
-
-          if (success) {
-            applied++;
-          } else {
-            failed++;
-            failedItems.push(change.find.substring(0, 50) + '...');
-          }
-        } catch (e) {
-          failed++;
-          failedItems.push(change.find.substring(0, 50) + '...');
-        }
+      let applied = 0, failed = 0, failedItems = [];
+      for (const c of changes) {
+        if (await replaceTextInDocument(c.find, c.replace)) { applied++; }
+        else { failed++; failedItems.push(c.find.substring(0, 40)); }
       }
-
       return { applied, failed, failedItems };
     }
 
-    async function insertTextAtCursor(text) {
+    async function replaceFullDocument(newContent) {
       if (!officeReady) return false;
-      return new Promise((resolve) => {
-        try {
-          Word.run(async (context) => {
-            const selection = context.document.getSelection();
-            selection.insertText(text, Word.InsertLocation.replace);
-            await context.sync();
-            resolve(true);
-          }).catch(() => resolve(false));
-        } catch (e) {
-          resolve(false);
-        }
+      return new Promise(r => {
+        Word.run(async ctx => {
+          try { ctx.document.load('changeTrackingMode'); await ctx.sync(); ctx.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll; await ctx.sync(); } catch(e) {}
+          ctx.document.body.clear();
+          ctx.document.body.insertText(newContent, Word.InsertLocation.start);
+          await ctx.sync(); r(true);
+        }).catch(() => r(false));
       });
     }
 
-    async function insertTextAtEnd(text) {
-      if (!officeReady) return false;
-      return new Promise((resolve) => {
-        try {
-          Word.run(async (context) => {
-            const body = context.document.body;
-            body.insertText('\n' + text, Word.InsertLocation.end);
-            await context.sync();
-            resolve(true);
-          }).catch(() => resolve(false));
-        } catch (e) {
-          resolve(false);
-        }
-      });
-    }
-
-    /* ══════════════════════════════════════
-       PARSE CLAUDE RESPONSE FOR CHANGES
-       ══════════════════════════════════════ */
-    function parseChangesFromResponse(text) {
-      const jsonMatch = text.match(/```json-changes\s*\n([\s\S]*?)\n```/);
-      if (!jsonMatch) return null;
-
-      try {
-        const parsed = JSON.parse(jsonMatch[1]);
-        if (parsed.changes && Array.isArray(parsed.changes)) {
-          return parsed;
-        }
-      } catch (e) {
-        console.error('Failed to parse changes JSON:', e);
-      }
+    /* ── Parse ── */
+    function parseChanges(text) {
+      const m = text.match(/```json-changes\s*\n([\s\S]*?)\n```/);
+      if (!m) return null;
+      try { const p = JSON.parse(m[1]); if (p.changes && Array.isArray(p.changes)) return p; } catch(e) {}
       return null;
     }
+    function stripChangesBlock(text) { return text.replace(/```json-changes\s*\n[\s\S]*?\n```/, '').trim(); }
 
-    function getTextWithoutChangesBlock(text) {
-      return text.replace(/```json-changes\s*\n[\s\S]*?\n```/, '').trim();
-    }
-
-    /* ══════════════════════════════════════
-       CHAT LOGIC
-       ══════════════════════════════════════ */
-    function handleKeyDown(e) {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    }
-
-    function autoResize(el) {
-      el.style.height = 'auto';
-      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
-    }
-
-    function quickAction(text) {
-      document.getElementById('user-input').value = text;
-      sendMessage();
-    }
+    /* ── Chat ── */
+    function handleKeyDown(e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }
+    function autoResize(el) { el.style.height = 'auto'; el.style.height = Math.min(el.scrollHeight, 120) + 'px'; }
+    function quickAction(t) { document.getElementById('user-input').value = t; sendMessage(); }
 
     function newChat() {
       conversationHistory = [];
-      const messages = document.getElementById('chat-messages');
-      const welcome = messages.querySelector('.welcome');
-      const typing = document.getElementById('typing-indicator');
-      messages.innerHTML = '';
-      if (welcome) messages.appendChild(welcome);
-      welcome.style.display = 'block';
-      messages.appendChild(typing);
+      const m = document.getElementById('chat-messages'), w = m.querySelector('.welcome'), t = document.getElementById('typing-indicator');
+      m.innerHTML = ''; if (w) { m.appendChild(w); w.style.display = 'block'; } m.appendChild(t);
       document.getElementById('quick-actions').style.display = 'flex';
     }
 
     async function sendMessage() {
-      const input = document.getElementById('user-input');
-      const text = input.value.trim();
+      const input = document.getElementById('user-input'), text = input.value.trim();
       if (!text || isProcessing) return;
-
-      isProcessing = true;
-      input.value = '';
-      autoResize(input);
+      isProcessing = true; input.value = ''; autoResize(input);
       document.getElementById('send-btn').disabled = true;
 
-      // Hide welcome & quick actions
-      const welcome = document.querySelector('.welcome');
-      if (welcome) welcome.style.display = 'none';
+      const w = document.querySelector('.welcome'); if (w) w.style.display = 'none';
       document.getElementById('quick-actions').style.display = 'none';
 
-      // Get document context
-      let docContext = '';
-      const includeDoc = document.getElementById('include-doc').checked;
-      if (includeDoc) {
-        docContext = await getDocumentContent();
-      }
+      let doc = '', sel = await getSelectedText();
+      if (document.getElementById('include-doc').checked) doc = await getDocumentContent();
 
-      // Check for selected text
-      const selectedText = await getSelectedText();
+      let full = text;
+      if (sel) full = `[Selected text]: "${sel}"\n\n${text}`;
+      if (doc) full = `[Document content]:\n${doc}\n\n---\n\n${full}`;
 
-      // Build the user message
-      let fullMessage = text;
-      if (selectedText) {
-        fullMessage = `[Selected text in document]:\n"${selectedText}"\n\n${text}`;
-      }
-      if (docContext) {
-        fullMessage = `[Current document content]:\n${docContext}\n\n---\n\n${text}`;
-      }
-
-      // Add user message to UI
       addMessageToUI('user', text);
-
-      // Add to conversation history
-      conversationHistory.push({ role: 'user', content: fullMessage });
-
-      // Show typing indicator
+      conversationHistory.push({ role: 'user', content: full });
       showTyping(true);
 
       try {
-        const response = await callClaudeAPI();
+        const resp = await callAPI();
         showTyping(false);
-
-        // Check if response contains document changes
-        const changesData = parseChangesFromResponse(response);
-
-        if (changesData) {
-          // Show the changes preview and apply button
-          const explanation = getTextWithoutChangesBlock(response);
-          addChangesMessageToUI(changesData, explanation, response);
-        } else {
-          // Regular text response
-          addMessageToUI('assistant', response, true);
-        }
-
-        conversationHistory.push({ role: 'assistant', content: response });
-      } catch (error) {
+        const changes = parseChanges(resp);
+        if (changes) { addChangesUI(changes, stripChangesBlock(resp), resp); }
+        else { addMessageToUI('assistant', resp, true); }
+        conversationHistory.push({ role: 'assistant', content: resp });
+      } catch(err) {
         showTyping(false);
-        addStatusToUI('error', error.message || 'Something went wrong. Please try again.');
+        addStatus('error', err.message || 'Something went wrong.');
       }
 
-      isProcessing = false;
-      document.getElementById('send-btn').disabled = false;
-      input.focus();
+      isProcessing = false; document.getElementById('send-btn').disabled = false; input.focus();
     }
 
-    async function callClaudeAPI() {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+    async function callAPI() {
+      // Build Gemini API contents from conversation history
+      const geminiContents = conversationHistory.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }]
+      }));
+
+      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=' + API_KEY, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5-20250929',
-          max_tokens: 4096,
-          system: SYSTEM_PROMPT,
-          messages: conversationHistory
+          system_instruction: {
+            parts: [{ text: SYSTEM_PROMPT }]
+          },
+          contents: geminiContents,
+          generationConfig: {
+            temperature: 1.0,
+            maxOutputTokens: 4096
+          }
         })
       });
 
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        if (response.status === 401) {
-          throw new Error('Invalid API key. Please check your key in settings.');
+      if (!r.ok) {
+        const e = await r.json().catch(() => ({}));
+        if (r.status === 400 && e.error?.message?.includes('API key')) {
+          throw new Error('Invalid API key. Check settings.');
         }
-        throw new Error(err.error?.message || `API error (${response.status})`);
+        throw new Error(e.error?.message || `API error (${r.status})`);
       }
 
-      const data = await response.json();
-      return data.content
-        .filter(block => block.type === 'text')
-        .map(block => block.text)
+      const d = await r.json();
+
+      if (!d.candidates || d.candidates.length === 0) {
+        throw new Error('No response from Gemini. The content may have been blocked.');
+      }
+
+      // Extract text from all parts
+      const parts = d.candidates[0].content?.parts || [];
+      return parts
+        .filter(p => p.text)
+        .map(p => p.text)
         .join('\n');
     }
 
-    /* ══════════════════════════════════════
-       UI HELPERS
-       ══════════════════════════════════════ */
-    function addMessageToUI(role, text, includeActions = false) {
-      const container = document.getElementById('chat-messages');
-      const typing = document.getElementById('typing-indicator');
-
-      const msg = document.createElement('div');
-      msg.className = `message ${role}`;
-
-      const avatar = document.createElement('div');
-      avatar.className = 'avatar';
-      avatar.textContent = role === 'user' ? 'M' : 'C';
-
-      const content = document.createElement('div');
-      content.className = 'content';
-
-      const sender = document.createElement('div');
-      sender.className = 'sender';
-      sender.textContent = role === 'user' ? 'You' : 'Claude';
-
-      const textEl = document.createElement('div');
-      textEl.className = 'text';
-      textEl.innerHTML = formatMarkdown(text);
-
-      content.appendChild(sender);
-      content.appendChild(textEl);
-
-      if (includeActions && role === 'assistant') {
-        const actions = document.createElement('div');
-        actions.className = 'message-actions';
-
-        const copyBtn = document.createElement('button');
-        copyBtn.textContent = 'Copy';
-        copyBtn.onclick = () => {
-          navigator.clipboard.writeText(text).then(() => {
-            copyBtn.textContent = 'Copied!';
-            setTimeout(() => copyBtn.textContent = 'Copy', 1500);
-          });
-        };
-
-        const insertBtn = document.createElement('button');
-        insertBtn.textContent = 'Insert at cursor';
-        insertBtn.onclick = async () => {
-          const success = await insertTextAtCursor(text);
-          insertBtn.textContent = success ? 'Inserted!' : 'Failed';
-          setTimeout(() => insertBtn.textContent = 'Insert at cursor', 1500);
-        };
-
-        actions.appendChild(copyBtn);
-        actions.appendChild(insertBtn);
-        content.appendChild(actions);
+    /* ── UI ── */
+    function addMessageToUI(role, text, actions = false) {
+      const c = document.getElementById('chat-messages'), t = document.getElementById('typing-indicator');
+      const msg = document.createElement('div'); msg.className = `message ${role}`;
+      msg.innerHTML = `<div class="avatar">${role === 'user' ? 'M' : 'G'}</div>
+        <div class="content"><div class="sender">${role === 'user' ? 'You' : 'Gemini'}</div><div class="text">${formatMD(text)}</div>
+        ${actions && role === 'assistant' ? '<div class="message-actions"></div>' : ''}</div>`;
+      c.insertBefore(msg, t);
+      if (actions && role === 'assistant') {
+        const ad = msg.querySelector('.message-actions');
+        const cb = document.createElement('button'); cb.textContent = 'Copy';
+        cb.onclick = () => { navigator.clipboard.writeText(text); cb.textContent = 'Copied!'; setTimeout(() => cb.textContent = 'Copy', 1500); };
+        ad.appendChild(cb);
+        const rb = document.createElement('button'); rb.textContent = 'Replace document';
+        rb.onclick = async () => { if (confirm('Replace entire document?')) { rb.textContent = 'Replacing...'; const ok = await replaceFullDocument(text); rb.textContent = ok ? 'Done!' : 'Failed'; if (ok) addStatus('success', 'Document replaced. Use Track Changes to review.'); } };
+        ad.appendChild(rb);
       }
-
-      msg.appendChild(avatar);
-      msg.appendChild(content);
-
-      container.insertBefore(msg, typing);
-      container.scrollTop = container.scrollHeight;
+      c.scrollTop = c.scrollHeight;
     }
 
-    function addChangesMessageToUI(changesData, explanation, fullResponse) {
-      const container = document.getElementById('chat-messages');
-      const typing = document.getElementById('typing-indicator');
+    function addChangesUI(data, explanation, full) {
+      const c = document.getElementById('chat-messages'), t = document.getElementById('typing-indicator');
+      const msg = document.createElement('div'); msg.className = 'message assistant';
 
-      const msg = document.createElement('div');
-      msg.className = 'message assistant';
+      let html = data.changes.map(ch => {
+        const f = esc(ch.find.length > 60 ? ch.find.substring(0,60)+'...' : ch.find);
+        const r = esc(ch.replace.length > 60 ? ch.replace.substring(0,60)+'...' : ch.replace);
+        return `<div class="change-item"><span class="change-old">${f}</span><span class="change-arrow"> → </span><span class="change-new">${r}</span></div>`;
+      }).join('');
 
-      const avatar = document.createElement('div');
-      avatar.className = 'avatar';
-      avatar.textContent = 'C';
+      msg.innerHTML = `<div class="avatar">G</div><div class="content">
+        <div class="sender">Gemini</div>
+        ${data.summary ? `<div class="text">${esc(data.summary)}</div>` : ''}
+        <div class="changes-preview"><div class="changes-header">${data.changes.length} change${data.changes.length>1?'s':''}</div>${html}</div>
+        <div class="message-actions"></div>
+        ${explanation ? `<div class="text" style="margin-top:8px">${formatMD(explanation)}</div>` : ''}
+      </div>`;
 
-      const content = document.createElement('div');
-      content.className = 'content';
+      c.insertBefore(msg, t);
 
-      const sender = document.createElement('div');
-      sender.className = 'sender';
-      sender.textContent = 'Claude';
-
-      content.appendChild(sender);
-
-      // Summary text
-      if (changesData.summary) {
-        const summaryEl = document.createElement('div');
-        summaryEl.className = 'text';
-        summaryEl.textContent = changesData.summary;
-        content.appendChild(summaryEl);
-      }
-
-      // Changes preview
-      const preview = document.createElement('div');
-      preview.className = 'changes-preview';
-
-      const header = document.createElement('div');
-      header.className = 'changes-header';
-      header.textContent = `${changesData.changes.length} change${changesData.changes.length > 1 ? 's' : ''} to apply`;
-      preview.appendChild(header);
-
-      changesData.changes.forEach((change, i) => {
-        const item = document.createElement('div');
-        item.className = 'change-item';
-
-        const findText = change.find.length > 80 ? change.find.substring(0, 80) + '...' : change.find;
-        const replaceText = change.replace.length > 80 ? change.replace.substring(0, 80) + '...' : change.replace;
-
-        item.innerHTML = `<span class="change-old">${escapeHtml(findText)}</span>` +
-          `<span class="change-arrow"> → </span>` +
-          `<span class="change-new">${escapeHtml(replaceText)}</span>`;
-        preview.appendChild(item);
-      });
-
-      content.appendChild(preview);
-
-      // Action buttons
-      const actions = document.createElement('div');
-      actions.className = 'message-actions';
-
-      const applyBtn = document.createElement('button');
-      applyBtn.className = 'primary-action';
-      applyBtn.textContent = 'Apply Changes';
-      applyBtn.onclick = async () => {
-        applyBtn.textContent = 'Applying...';
-        applyBtn.disabled = true;
-
-        const result = await applyChangesToDocument(changesData.changes);
-
-        if (result.applied > 0 && result.failed === 0) {
-          addStatusToUI('success', `All ${result.applied} change${result.applied > 1 ? 's' : ''} applied successfully! Review them in your document.`);
-        } else if (result.applied > 0 && result.failed > 0) {
-          addStatusToUI('info', `Applied ${result.applied} change${result.applied > 1 ? 's' : ''}. ${result.failed} could not be matched in the document.`);
-        } else {
-          addStatusToUI('error', `Could not find the text to replace. The document may have changed. Try again.`);
-        }
-
-        applyBtn.textContent = 'Applied';
+      const ad = msg.querySelector('.message-actions');
+      const ab = document.createElement('button'); ab.className = 'primary-action'; ab.textContent = 'Apply Changes';
+      ab.onclick = async () => {
+        ab.textContent = 'Applying...'; ab.disabled = true;
+        const res = await applyChangesToDocument(data.changes);
+        if (res.applied > 0 && res.failed === 0) addStatus('success', `All ${res.applied} change${res.applied>1?'s':''} applied!`);
+        else if (res.applied > 0) addStatus('info', `Applied ${res.applied}, ${res.failed} failed: ${res.failedItems.join(', ')}`);
+        else addStatus('error', 'Could not match text. Try selecting text first or ask Gemini to retry.');
+        ab.textContent = res.applied > 0 ? 'Applied' : 'Failed';
       };
+      ad.appendChild(ab);
 
-      const copyBtn = document.createElement('button');
-      copyBtn.textContent = 'Copy response';
-      copyBtn.onclick = () => {
-        navigator.clipboard.writeText(fullResponse).then(() => {
-          copyBtn.textContent = 'Copied!';
-          setTimeout(() => copyBtn.textContent = 'Copy response', 1500);
-        });
-      };
+      const cb = document.createElement('button'); cb.textContent = 'Copy';
+      cb.onclick = () => { navigator.clipboard.writeText(full); cb.textContent = 'Copied!'; setTimeout(() => cb.textContent = 'Copy', 1500); };
+      ad.appendChild(cb);
 
-      actions.appendChild(applyBtn);
-      actions.appendChild(copyBtn);
-      content.appendChild(actions);
-
-      // Explanation text
-      if (explanation) {
-        const explEl = document.createElement('div');
-        explEl.className = 'text';
-        explEl.style.marginTop = '8px';
-        explEl.innerHTML = formatMarkdown(explanation);
-        content.appendChild(explEl);
-      }
-
-      msg.appendChild(avatar);
-      msg.appendChild(content);
-
-      container.insertBefore(msg, typing);
-      container.scrollTop = container.scrollHeight;
+      c.scrollTop = c.scrollHeight;
     }
 
-    function addStatusToUI(type, message) {
-      const container = document.getElementById('chat-messages');
-      const typing = document.getElementById('typing-indicator');
-
-      const statusDiv = document.createElement('div');
-      statusDiv.className = `status-msg ${type}`;
-      statusDiv.textContent = message;
-
-      container.insertBefore(statusDiv, typing);
-      container.scrollTop = container.scrollHeight;
+    function addStatus(type, msg) {
+      const c = document.getElementById('chat-messages'), t = document.getElementById('typing-indicator');
+      const d = document.createElement('div'); d.className = `status-msg ${type}`; d.textContent = msg;
+      c.insertBefore(d, t); c.scrollTop = c.scrollHeight;
     }
 
-    function showTyping(show) {
-      const indicator = document.getElementById('typing-indicator');
-      indicator.classList.toggle('visible', show);
-      if (show) {
-        const container = document.getElementById('chat-messages');
-        container.scrollTop = container.scrollHeight;
-      }
+    function showTyping(s) { document.getElementById('typing-indicator').classList.toggle('visible', s); if (s) document.getElementById('chat-messages').scrollTop = document.getElementById('chat-messages').scrollHeight; }
+
+    function formatMD(t) {
+      let h = esc(t);
+      h = h.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
+      h = h.replace(/`([^`]+)`/g, '<code>$1</code>');
+      h = h.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+      h = h.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+      h = h.replace(/\n/g, '<br>');
+      return h;
     }
 
-    function formatMarkdown(text) {
-      let html = escapeHtml(text);
-      html = html.replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>');
-      html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
-      html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-      html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-      html = html.replace(/\n/g, '<br>');
-      return html;
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement('div');
-      div.textContent = text;
-      return div.innerHTML;
-    }
+    function esc(t) { const d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
   </script>
 </body>
 </html>
