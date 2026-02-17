@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80">
+    <rect width="80" height="80" rx="16" fill="#D97757"/>
+    <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"
+          font-family="Arial, sans-serif" font-weight="bold"
+          font-size="36" fill="white">C</text>
+  </svg>
