@@ -13,6 +13,8 @@
       --user-bg: #F0EFEB; --assistant-bg: #FFFFFF; --hover: #EEEDEA;
     }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 13px; line-height: 1.5; }
+
+    /* ── Setup Screen ── */
     #setup-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 24px; text-align: center; }
     #setup-screen .logo { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
     #setup-screen .logo svg { width: 28px; height: 28px; }
@@ -24,14 +26,36 @@
     #setup-screen .hint { margin-top: 12px; font-size: 11px; color: var(--text-secondary); }
     #setup-screen .hint a { color: var(--accent); text-decoration: none; }
 
+    /* ── Mode Select Screen ── */
+    #mode-screen { display: none; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 24px; text-align: center; }
+    #mode-screen .logo { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    #mode-screen .logo svg { width: 28px; height: 28px; }
+    #mode-screen h1 { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    #mode-screen .subtitle { color: var(--text-secondary); font-size: 12.5px; margin-bottom: 24px; }
+
+    .mode-cards { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 300px; }
+    .mode-card {
+      border: 2px solid var(--border); border-radius: 12px; padding: 16px;
+      cursor: pointer; text-align: left; background: var(--assistant-bg);
+      transition: all 0.2s ease;
+    }
+    .mode-card:hover { border-color: var(--accent); background: #F0FDF8; }
+    .mode-card.active { border-color: var(--accent); background: #F0FDF8; }
+    .mode-card .mode-icon { font-size: 24px; margin-bottom: 8px; }
+    .mode-card .mode-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--text); }
+    .mode-card .mode-desc { font-size: 11.5px; color: var(--text-secondary); line-height: 1.4; }
+
+    /* ── Header ── */
     .header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--assistant-bg); flex-shrink: 0; }
     .header .logo-small { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .header .logo-small svg { width: 16px; height: 16px; }
     .header .title { font-weight: 600; font-size: 14px; flex: 1; }
+    .header .mode-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 10px; background: #ECFDF5; color: var(--accent); border: 1px solid #A7F3D0; }
     .header .actions { display: flex; gap: 4px; }
     .header .actions button { background: none; border: none; padding: 4px 6px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 12px; }
     .header .actions button:hover { background: var(--hover); }
 
+    /* ── Chat ── */
     #chat-screen { display: none; flex-direction: column; height: 100vh; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
     .message { display: flex; gap: 10px; }
@@ -101,6 +125,7 @@
 </head>
 <body>
 
+  <!-- ════════ SCREEN 1: API Key ════════ -->
   <div id="setup-screen">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
     <h1>GPT for Word</h1>
@@ -110,21 +135,43 @@
     <p class="hint">Get your API key at <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></p>
   </div>
 
+  <!-- ════════ SCREEN 2: Mode Selection ════════ -->
+  <div id="mode-screen">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
+    <h1>Choose a Mode</h1>
+    <p class="subtitle">How would you like GPT to work with your document?</p>
+    <div class="mode-cards">
+      <div class="mode-card" onclick="selectMode('rewriter')">
+        <div class="mode-icon">&#9997;&#65039;</div>
+        <div class="mode-title">Full Rewriter</div>
+        <div class="mode-desc">GPT rewrites your entire document based on your instructions. The full text is replaced with a new version.</div>
+      </div>
+      <div class="mode-card" onclick="selectMode('editor')">
+        <div class="mode-icon">&#128269;</div>
+        <div class="mode-title">Editor</div>
+        <div class="mode-desc">GPT makes targeted edits — fix grammar, improve phrases, translate words. Changes are applied one by one with preview.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════ SCREEN 3: Chat ════════ -->
   <div id="chat-screen">
     <div class="header">
       <div class="logo-small"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
       <span class="title">GPT for Word</span>
+      <span class="mode-badge" id="mode-badge">EDITOR</span>
       <div class="actions">
+        <button onclick="switchMode()" title="Switch mode">Mode</button>
         <button onclick="newChat()">New</button>
         <button onclick="showSettings()">&#9881;</button>
       </div>
     </div>
 
     <div class="chat-messages" id="chat-messages">
-      <div class="welcome">
+      <div class="welcome" id="welcome-msg">
         <div class="logo-large"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
-        <h2>How can I help?</h2>
-        <p>I can read and directly edit your document. Ask me to fix grammar, improve style, translate, or rewrite.</p>
+        <h2 id="welcome-title">How can I help?</h2>
+        <p id="welcome-desc">I can read and directly edit your document.</p>
       </div>
       <div class="typing-indicator message assistant" id="typing-indicator">
         <div class="avatar">G</div>
@@ -132,29 +179,26 @@
       </div>
     </div>
 
-    <div class="quick-actions" id="quick-actions">
-      <button onclick="quickAction('Fix grammar and spelling')">Fix Grammar</button>
-      <button onclick="quickAction('Improve writing style')">Improve Style</button>
-      <button onclick="quickAction('Translate to French')">Translate</button>
-      <button onclick="quickAction('Summarize')">Summarize</button>
-    </div>
+    <div class="quick-actions" id="quick-actions"></div>
 
     <div class="input-area">
       <div class="input-wrapper">
-        <textarea id="user-input" placeholder="Ask GPT to edit your document..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+        <textarea id="user-input" placeholder="Describe what you want..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
         <button class="send-btn" id="send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
       </div>
       <div class="input-footer">
         <label class="context-toggle"><input type="checkbox" id="include-doc" checked /> Include document</label>
-        <span class="model-info">GPT-4o</span>
+        <span class="model-info">GPT-5.2</span>
       </div>
     </div>
   </div>
 
   <script>
     let API_KEY = '', conversationHistory = [], isProcessing = false, officeReady = false;
+    let currentMode = 'editor'; // 'editor' or 'rewriter'
 
-    const SYSTEM_PROMPT = `You are GPT, an AI assistant in Microsoft Word. You edit documents directly.
+    /* ── System Prompts ── */
+    const EDITOR_PROMPT = `You are GPT, an AI assistant in Microsoft Word. You make targeted edits to documents.
 
 When asked to edit/fix/improve/translate text, respond with JSON changes:
 
@@ -184,14 +228,111 @@ BAD example (too long):
 
 For questions (summarize, explain) without editing, respond normally without JSON.`;
 
+    const REWRITER_PROMPT = `You are GPT, an AI assistant in Microsoft Word. You rewrite entire documents based on user instructions.
+
+The user will provide the current document content and describe how they want it rewritten. Your job is to return the COMPLETE rewritten document text.
+
+RULES:
+1. Return ONLY the rewritten document text — no explanations, no commentary before or after
+2. Rewrite the ENTIRE document according to the user's instructions
+3. Maintain the document's structure (paragraphs, sections) unless told otherwise
+4. If the user asks to change tone, style, language, format, etc., apply it to the whole document
+5. Do NOT wrap your response in code blocks or quotes — just return the plain rewritten text
+6. Preserve any formatting cues like headings or bullet points in plain text form
+7. If the user asks a question instead of requesting a rewrite, answer normally
+
+The user's rewritten document will replace the entire original document.`;
+
     Office.onReady(function() {
       officeReady = true;
       const k = localStorage.getItem('openai_api_key');
-      if (k) { API_KEY = k; showChatScreen(); }
+      if (k) {
+        API_KEY = k;
+        showModeScreen();
+      }
     });
 
-    function saveApiKey() { const k = document.getElementById('api-key-input').value.trim(); if (!k) return; API_KEY = k; localStorage.setItem('openai_api_key', k); showChatScreen(); }
-    function showChatScreen() { document.getElementById('setup-screen').style.display = 'none'; document.getElementById('chat-screen').style.display = 'flex'; document.getElementById('user-input').focus(); }
+    /* ── Navigation ── */
+    function saveApiKey() {
+      const k = document.getElementById('api-key-input').value.trim();
+      if (!k) return;
+      API_KEY = k;
+      localStorage.setItem('openai_api_key', k);
+      showModeScreen();
+    }
+
+    function showModeScreen() {
+      document.getElementById('setup-screen').style.display = 'none';
+      document.getElementById('mode-screen').style.display = 'flex';
+      document.getElementById('chat-screen').style.display = 'none';
+    }
+
+    function selectMode(mode) {
+      currentMode = mode;
+      document.getElementById('mode-screen').style.display = 'none';
+      document.getElementById('chat-screen').style.display = 'flex';
+      applyModeUI();
+      document.getElementById('user-input').focus();
+    }
+
+    function switchMode() {
+      conversationHistory = [];
+      showModeScreen();
+    }
+
+    function applyModeUI() {
+      const badge = document.getElementById('mode-badge');
+      const welcomeTitle = document.getElementById('welcome-title');
+      const welcomeDesc = document.getElementById('welcome-desc');
+      const input = document.getElementById('user-input');
+      const qa = document.getElementById('quick-actions');
+
+      if (currentMode === 'rewriter') {
+        badge.textContent = 'REWRITER';
+        badge.style.background = '#FEF3C7';
+        badge.style.color = '#D97706';
+        badge.style.borderColor = '#FCD34D';
+        welcomeTitle.textContent = 'Full Rewriter';
+        welcomeDesc.textContent = 'Describe how you want your document rewritten. The entire text will be replaced with a new version.';
+        input.placeholder = 'Describe how to rewrite the document...';
+        qa.innerHTML = '';
+        const btns = [
+          ['Make it more formal', 'Rewrite in a formal professional tone'],
+          ['Simplify language', 'Rewrite using simpler, clearer language'],
+          ['Translate to English', 'Translate the entire document to English'],
+          ['Make it shorter', 'Rewrite to be more concise, keeping key points']
+        ];
+        btns.forEach(([label, action]) => {
+          const b = document.createElement('button');
+          b.textContent = label;
+          b.onclick = () => quickAction(action);
+          qa.appendChild(b);
+        });
+      } else {
+        badge.textContent = 'EDITOR';
+        badge.style.background = '#ECFDF5';
+        badge.style.color = '#10A37F';
+        badge.style.borderColor = '#A7F3D0';
+        welcomeTitle.textContent = 'How can I help?';
+        welcomeDesc.textContent = 'I can fix grammar, improve style, translate phrases, and make targeted edits to your document.';
+        input.placeholder = 'Ask GPT to edit your document...';
+        qa.innerHTML = '';
+        const btns = [
+          ['Fix Grammar', 'Fix grammar and spelling'],
+          ['Improve Style', 'Improve writing style'],
+          ['Translate to French', 'Translate to French'],
+          ['Summarize', 'Summarize']
+        ];
+        btns.forEach(([label, action]) => {
+          const b = document.createElement('button');
+          b.textContent = label;
+          b.onclick = () => quickAction(action);
+          qa.appendChild(b);
+        });
+      }
+      qa.style.display = 'flex';
+    }
+
     function showSettings() { const k = prompt('Enter OpenAI API key:'); if (k) { API_KEY = k.trim(); localStorage.setItem('openai_api_key', API_KEY); } }
 
     /* ── Document Operations ── */
@@ -214,7 +355,6 @@ For questions (summarize, explain) without editing, respond normally without JSO
       return new Promise(resolve => {
         Word.run(async ctx => {
           try { ctx.document.load('changeTrackingMode'); await ctx.sync(); ctx.document.changeTrackingMode = Word.ChangeTrackingMode.trackAll; await ctx.sync(); } catch(e) {}
-
           const body = ctx.document.body;
 
           // Strategy 1: Exact match
@@ -234,7 +374,7 @@ For questions (summarize, explain) without editing, respond normally without JSO
             if (sr.items.length > 0) { sr.items[0].insertText(replaceText, Word.InsertLocation.replace); await ctx.sync(); resolve(true); return; }
           }
 
-          // Strategy 4: Paragraph-level text replacement
+          // Strategy 4: Paragraph-level
           try {
             const paragraphs = body.paragraphs;
             paragraphs.load('items'); await ctx.sync();
@@ -244,30 +384,25 @@ For questions (summarize, explain) without editing, respond normally without JSO
               if (p.text && p.text.includes(findText)) {
                 const newText = p.text.replace(findText, replaceText);
                 p.insertText(newText, Word.InsertLocation.replace);
-                await ctx.sync();
-                resolve(true);
-                return;
+                await ctx.sync(); resolve(true); return;
               }
             }
           } catch(e) {}
 
-          // Strategy 5: Normalized whitespace comparison
+          // Strategy 5: Normalized whitespace
           try {
             const paragraphs = body.paragraphs;
             paragraphs.load('items'); await ctx.sync();
-            const normalizedFind = findText.replace(/\s+/g, ' ').trim();
+            const nf = findText.replace(/\s+/g, ' ').trim();
             for (let i = 0; i < paragraphs.items.length; i++) {
               const p = paragraphs.items[i];
               p.load('text'); await ctx.sync();
               if (p.text) {
-                const normalizedPara = p.text.replace(/\s+/g, ' ').trim();
-                if (normalizedPara.includes(normalizedFind)) {
-                  const idx = normalizedPara.indexOf(normalizedFind);
-                  const newText = normalizedPara.substring(0, idx) + replaceText + normalizedPara.substring(idx + normalizedFind.length);
-                  p.insertText(newText, Word.InsertLocation.replace);
-                  await ctx.sync();
-                  resolve(true);
-                  return;
+                const np = p.text.replace(/\s+/g, ' ').trim();
+                if (np.includes(nf)) {
+                  const idx = np.indexOf(nf);
+                  p.insertText(np.substring(0, idx) + replaceText + np.substring(idx + nf.length), Word.InsertLocation.replace);
+                  await ctx.sync(); resolve(true); return;
                 }
               }
             }
@@ -317,7 +452,7 @@ For questions (summarize, explain) without editing, respond normally without JSO
       conversationHistory = [];
       const m = document.getElementById('chat-messages'), w = m.querySelector('.welcome'), t = document.getElementById('typing-indicator');
       m.innerHTML = ''; if (w) { m.appendChild(w); w.style.display = 'block'; } m.appendChild(t);
-      document.getElementById('quick-actions').style.display = 'flex';
+      applyModeUI();
     }
 
     async function sendMessage() {
@@ -343,9 +478,17 @@ For questions (summarize, explain) without editing, respond normally without JSO
       try {
         const resp = await callAPI();
         showTyping(false);
-        const changes = parseChanges(resp);
-        if (changes) { addChangesUI(changes, stripChangesBlock(resp), resp); }
-        else { addMessageToUI('assistant', resp, true); }
+
+        if (currentMode === 'rewriter') {
+          // Rewriter mode: show the rewritten text with a Replace button
+          addRewriterMessageToUI(resp);
+        } else {
+          // Editor mode: parse JSON changes or show plain text
+          const changes = parseChanges(resp);
+          if (changes) { addChangesUI(changes, stripChangesBlock(resp), resp); }
+          else { addMessageToUI('assistant', resp, true); }
+        }
+
         conversationHistory.push({ role: 'assistant', content: resp });
       } catch(err) {
         showTyping(false);
@@ -356,9 +499,9 @@ For questions (summarize, explain) without editing, respond normally without JSO
     }
 
     async function callAPI() {
-      // Build OpenAI messages array with system prompt
+      const systemPrompt = currentMode === 'rewriter' ? REWRITER_PROMPT : EDITOR_PROMPT;
       const messages = [
-        { role: 'system', content: SYSTEM_PROMPT },
+        { role: 'system', content: systemPrompt },
         ...conversationHistory
       ];
 
@@ -369,17 +512,16 @@ For questions (summarize, explain) without editing, respond normally without JSO
           'Authorization': 'Bearer ' + API_KEY
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-5.2',
           messages: messages,
-          max_tokens: 4096,
-          temperature: 0.7
+          max_completion_tokens: 16384
         })
       });
 
       if (!r.ok) {
         const e = await r.json().catch(() => ({}));
         if (r.status === 401) throw new Error('Invalid API key. Check settings.');
-        if (r.status === 429) throw new Error('Rate limit exceeded. Please wait a moment.');
+        if (r.status === 429) throw new Error('Rate limit exceeded. Please wait.');
         if (r.status === 402) throw new Error('Insufficient credits. Add billing at platform.openai.com.');
         throw new Error(e.error?.message || `API error (${r.status})`);
       }
@@ -401,10 +543,61 @@ For questions (summarize, explain) without editing, respond normally without JSO
         const cb = document.createElement('button'); cb.textContent = 'Copy';
         cb.onclick = () => { navigator.clipboard.writeText(text); cb.textContent = 'Copied!'; setTimeout(() => cb.textContent = 'Copy', 1500); };
         ad.appendChild(cb);
-        const rb = document.createElement('button'); rb.textContent = 'Replace document';
-        rb.onclick = async () => { if (confirm('Replace entire document?')) { rb.textContent = 'Replacing...'; const ok = await replaceFullDocument(text); rb.textContent = ok ? 'Done!' : 'Failed'; if (ok) addStatus('success', 'Document replaced. Use Track Changes to review.'); } };
-        ad.appendChild(rb);
       }
+      c.scrollTop = c.scrollHeight;
+    }
+
+    function addRewriterMessageToUI(text) {
+      const c = document.getElementById('chat-messages'), t = document.getElementById('typing-indicator');
+      const msg = document.createElement('div'); msg.className = 'message assistant';
+
+      // Show a truncated preview
+      const preview = text.length > 300 ? text.substring(0, 300) + '...' : text;
+
+      msg.innerHTML = `<div class="avatar">G</div><div class="content">
+        <div class="sender">GPT</div>
+        <div class="text" style="background: #F0FDF4; border: 1px solid #BBF7D0; padding: 10px; border-radius: 8px; font-size: 12px; max-height: 200px; overflow-y: auto;">${esc(preview)}</div>
+        <div style="font-size: 11px; color: var(--text-secondary); margin-top: 4px;">${text.length} characters — full rewrite ready</div>
+        <div class="message-actions"></div>
+      </div>`;
+
+      c.insertBefore(msg, t);
+
+      const ad = msg.querySelector('.message-actions');
+
+      const rb = document.createElement('button');
+      rb.className = 'primary-action';
+      rb.textContent = 'Replace Document';
+      rb.onclick = async () => {
+        rb.textContent = 'Replacing...'; rb.disabled = true;
+        const ok = await replaceFullDocument(text);
+        rb.textContent = ok ? 'Replaced!' : 'Failed';
+        if (ok) addStatus('success', 'Document replaced with rewritten version. Use Track Changes to review.');
+        else addStatus('error', 'Failed to replace document.');
+      };
+      ad.appendChild(rb);
+
+      const cb = document.createElement('button');
+      cb.textContent = 'Copy';
+      cb.onclick = () => { navigator.clipboard.writeText(text); cb.textContent = 'Copied!'; setTimeout(() => cb.textContent = 'Copy', 1500); };
+      ad.appendChild(cb);
+
+      const eb = document.createElement('button');
+      eb.textContent = 'Show Full Text';
+      eb.onclick = () => {
+        const textDiv = msg.querySelector('.text');
+        if (eb.textContent === 'Show Full Text') {
+          textDiv.textContent = text;
+          textDiv.style.maxHeight = '400px';
+          eb.textContent = 'Show Less';
+        } else {
+          textDiv.textContent = preview;
+          textDiv.style.maxHeight = '200px';
+          eb.textContent = 'Show Full Text';
+        }
+      };
+      ad.appendChild(eb);
+
       c.scrollTop = c.scrollHeight;
     }
 
