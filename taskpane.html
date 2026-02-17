@@ -3,60 +3,60 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Claude for Word</title>
+  <title>GPT for Word</title>
   <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
-      --claude-orange: #4285F4; --claude-bg: #FAF9F7; --claude-text: #1A1A1A;
-      --claude-text-secondary: #6B6560; --claude-border: #E8E5E0;
-      --claude-user-bg: #F0EFEB; --claude-assistant-bg: #FFFFFF; --claude-hover: #EEEDEA;
+      --accent: #10A37F; --accent-hover: #0D8C6D; --bg: #FAF9F7; --text: #1A1A1A;
+      --text-secondary: #6B6560; --border: #E8E5E0;
+      --user-bg: #F0EFEB; --assistant-bg: #FFFFFF; --hover: #EEEDEA;
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--claude-bg); color: var(--claude-text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 13px; line-height: 1.5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; font-size: 13px; line-height: 1.5; }
     #setup-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; padding: 24px; text-align: center; }
-    #setup-screen .logo { width: 48px; height: 48px; background: var(--claude-orange); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+    #setup-screen .logo { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-bottom: 16px; }
     #setup-screen .logo svg { width: 28px; height: 28px; }
     #setup-screen h1 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
-    #setup-screen p { color: var(--claude-text-secondary); font-size: 12.5px; margin-bottom: 20px; max-width: 260px; }
-    #setup-screen input { width: 100%; max-width: 300px; padding: 10px 14px; border: 1.5px solid var(--claude-border); border-radius: 8px; font-size: 13px; outline: none; }
-    #setup-screen input:focus { border-color: var(--claude-orange); }
-    #setup-screen .btn-primary { margin-top: 12px; width: 100%; max-width: 300px; padding: 10px; background: var(--claude-orange); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
-    #setup-screen .hint { margin-top: 12px; font-size: 11px; color: var(--claude-text-secondary); }
-    #setup-screen .hint a { color: var(--claude-orange); text-decoration: none; }
+    #setup-screen p { color: var(--text-secondary); font-size: 12.5px; margin-bottom: 20px; max-width: 260px; }
+    #setup-screen input { width: 100%; max-width: 300px; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; }
+    #setup-screen input:focus { border-color: var(--accent); }
+    #setup-screen .btn-primary { margin-top: 12px; width: 100%; max-width: 300px; padding: 10px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    #setup-screen .hint { margin-top: 12px; font-size: 11px; color: var(--text-secondary); }
+    #setup-screen .hint a { color: var(--accent); text-decoration: none; }
 
-    .header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--claude-border); background: var(--claude-assistant-bg); flex-shrink: 0; }
-    .header .logo-small { width: 28px; height: 28px; background: var(--claude-orange); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--assistant-bg); flex-shrink: 0; }
+    .header .logo-small { width: 28px; height: 28px; background: var(--accent); border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .header .logo-small svg { width: 16px; height: 16px; }
     .header .title { font-weight: 600; font-size: 14px; flex: 1; }
     .header .actions { display: flex; gap: 4px; }
-    .header .actions button { background: none; border: none; padding: 4px 6px; border-radius: 6px; cursor: pointer; color: var(--claude-text-secondary); font-size: 12px; }
-    .header .actions button:hover { background: var(--claude-hover); }
+    .header .actions button { background: none; border: none; padding: 4px 6px; border-radius: 6px; cursor: pointer; color: var(--text-secondary); font-size: 12px; }
+    .header .actions button:hover { background: var(--hover); }
 
     #chat-screen { display: none; flex-direction: column; height: 100vh; }
     .chat-messages { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
     .message { display: flex; gap: 10px; }
     .message .avatar { width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; margin-top: 2px; }
-    .message.user .avatar { background: var(--claude-user-bg); color: var(--claude-text-secondary); }
-    .message.assistant .avatar { background: var(--claude-orange); color: white; }
+    .message.user .avatar { background: var(--user-bg); color: var(--text-secondary); }
+    .message.assistant .avatar { background: var(--accent); color: white; }
     .message .content { flex: 1; min-width: 0; }
     .message .sender { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
     .message .text { font-size: 13px; line-height: 1.55; word-wrap: break-word; white-space: pre-wrap; }
-    .message .text code { background: var(--claude-hover); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+    .message .text code { background: var(--hover); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
     .message .text pre { background: #2D2D2D; color: #E6E6E6; padding: 12px; border-radius: 8px; overflow-x: auto; margin: 8px 0; font-size: 12px; }
 
     .message-actions { display: flex; gap: 6px; margin-top: 8px; flex-wrap: wrap; }
-    .message-actions button { padding: 5px 10px; border: 1px solid var(--claude-border); background: var(--claude-assistant-bg); border-radius: 6px; font-size: 11.5px; cursor: pointer; color: var(--claude-text-secondary); }
-    .message-actions button:hover { border-color: var(--claude-orange); color: var(--claude-orange); }
-    .message-actions button.primary-action { border-color: var(--claude-orange); background: var(--claude-orange); color: white; }
+    .message-actions button { padding: 5px 10px; border: 1px solid var(--border); background: var(--assistant-bg); border-radius: 6px; font-size: 11.5px; cursor: pointer; color: var(--text-secondary); }
+    .message-actions button:hover { border-color: var(--accent); color: var(--accent); }
+    .message-actions button.primary-action { border-color: var(--accent); background: var(--accent); color: white; }
     .message-actions button.primary-action:hover { opacity: 0.9; }
 
-    .changes-preview { margin-top: 8px; border: 1px solid var(--claude-border); border-radius: 8px; overflow: hidden; font-size: 12px; }
-    .changes-preview .changes-header { background: var(--claude-hover); padding: 6px 10px; font-weight: 600; font-size: 11.5px; color: var(--claude-text-secondary); border-bottom: 1px solid var(--claude-border); }
-    .change-item { padding: 8px 10px; border-bottom: 1px solid var(--claude-border); }
+    .changes-preview { margin-top: 8px; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; font-size: 12px; }
+    .changes-preview .changes-header { background: var(--hover); padding: 6px 10px; font-weight: 600; font-size: 11.5px; color: var(--text-secondary); border-bottom: 1px solid var(--border); }
+    .change-item { padding: 8px 10px; border-bottom: 1px solid var(--border); }
     .change-item:last-child { border-bottom: none; }
     .change-item .change-old { background: #FEE2E2; color: #991B1B; padding: 2px 4px; border-radius: 3px; text-decoration: line-through; }
     .change-item .change-new { background: #DCFCE7; color: #166534; padding: 2px 4px; border-radius: 3px; }
-    .change-item .change-arrow { color: var(--claude-text-secondary); margin: 0 4px; }
+    .change-item .change-arrow { color: var(--text-secondary); margin: 0 4px; }
 
     .status-msg { padding: 8px 12px; border-radius: 8px; font-size: 12px; margin-top: 4px; }
     .status-msg.success { background: #F0FDF4; border: 1px solid #BBF7D0; color: #166534; }
@@ -66,36 +66,36 @@
     .typing-indicator { display: none; gap: 10px; }
     .typing-indicator.visible { display: flex; }
     .typing-dots { display: flex; gap: 4px; align-items: center; padding-top: 4px; }
-    .typing-dots span { width: 6px; height: 6px; background: var(--claude-text-secondary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; opacity: 0.4; }
+    .typing-dots span { width: 6px; height: 6px; background: var(--text-secondary); border-radius: 50%; animation: bounce 1.4s infinite ease-in-out; opacity: 0.4; }
     .typing-dots span:nth-child(1) { animation-delay: 0s; }
     .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
     .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
     @keyframes bounce { 0%,80%,100% { transform: scale(0.8); opacity: 0.4; } 40% { transform: scale(1.2); opacity: 1; } }
 
     .quick-actions { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 16px 8px; flex-shrink: 0; }
-    .quick-actions button { padding: 6px 12px; border: 1px solid var(--claude-border); background: var(--claude-assistant-bg); border-radius: 16px; font-size: 11.5px; cursor: pointer; color: var(--claude-text-secondary); white-space: nowrap; }
-    .quick-actions button:hover { border-color: var(--claude-orange); color: var(--claude-orange); }
+    .quick-actions button { padding: 6px 12px; border: 1px solid var(--border); background: var(--assistant-bg); border-radius: 16px; font-size: 11.5px; cursor: pointer; color: var(--text-secondary); white-space: nowrap; }
+    .quick-actions button:hover { border-color: var(--accent); color: var(--accent); }
 
-    .input-area { padding: 12px 16px 16px; border-top: 1px solid var(--claude-border); background: var(--claude-assistant-bg); flex-shrink: 0; }
+    .input-area { padding: 12px 16px 16px; border-top: 1px solid var(--border); background: var(--assistant-bg); flex-shrink: 0; }
     .input-wrapper { display: flex; gap: 8px; align-items: flex-end; }
-    .input-wrapper textarea { flex: 1; padding: 10px 14px; border: 1.5px solid var(--claude-border); border-radius: 10px; font-size: 13px; font-family: inherit; resize: none; outline: none; min-height: 40px; max-height: 120px; background: var(--claude-bg); line-height: 1.4; }
-    .input-wrapper textarea:focus { border-color: var(--claude-orange); }
-    .input-wrapper .send-btn { width: 36px; height: 36px; background: var(--claude-orange); border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .input-wrapper textarea { flex: 1; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; font-size: 13px; font-family: inherit; resize: none; outline: none; min-height: 40px; max-height: 120px; background: var(--bg); line-height: 1.4; }
+    .input-wrapper textarea:focus { border-color: var(--accent); }
+    .input-wrapper .send-btn { width: 36px; height: 36px; background: var(--accent); border: none; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .input-wrapper .send-btn:disabled { opacity: 0.4; cursor: not-allowed; }
     .input-wrapper .send-btn svg { width: 16px; height: 16px; fill: white; }
     .input-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding: 0 2px; }
-    .input-footer .context-toggle { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--claude-text-secondary); cursor: pointer; }
-    .input-footer .context-toggle input[type="checkbox"] { accent-color: var(--claude-orange); }
-    .input-footer .model-info { font-size: 10.5px; color: var(--claude-text-secondary); }
+    .input-footer .context-toggle { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-secondary); cursor: pointer; }
+    .input-footer .context-toggle input[type="checkbox"] { accent-color: var(--accent); }
+    .input-footer .model-info { font-size: 10.5px; color: var(--text-secondary); }
 
     .chat-messages::-webkit-scrollbar { width: 5px; }
     .chat-messages::-webkit-scrollbar-track { background: transparent; }
-    .chat-messages::-webkit-scrollbar-thumb { background: var(--claude-border); border-radius: 3px; }
+    .chat-messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    .welcome { text-align: center; padding: 32px 16px; color: var(--claude-text-secondary); }
-    .welcome .logo-large { width: 44px; height: 44px; background: var(--claude-orange); border-radius: 11px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .welcome { text-align: center; padding: 32px 16px; color: var(--text-secondary); }
+    .welcome .logo-large { width: 44px; height: 44px; background: var(--accent); border-radius: 11px; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
     .welcome .logo-large svg { width: 24px; height: 24px; }
-    .welcome h2 { font-size: 16px; font-weight: 600; color: var(--claude-text); margin-bottom: 6px; }
+    .welcome h2 { font-size: 16px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
     .welcome p { font-size: 12.5px; }
   </style>
 </head>
@@ -103,17 +103,17 @@
 
   <div id="setup-screen">
     <div class="logo"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
-    <h1>Gemini for Word</h1>
-    <p>Enter your Google AI API key to start chatting with Gemini about your documents.</p>
-    <input type="password" id="api-key-input" placeholder="AIza..." />
+    <h1>GPT for Word</h1>
+    <p>Enter your OpenAI API key to start chatting with GPT about your documents.</p>
+    <input type="password" id="api-key-input" placeholder="sk-proj-..." />
     <button class="btn-primary" onclick="saveApiKey()">Get Started</button>
-    <p class="hint">Get your API key at <a href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com</a></p>
+    <p class="hint">Get your API key at <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></p>
   </div>
 
   <div id="chat-screen">
     <div class="header">
       <div class="logo-small"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15l-1-1 4-4-4-4 1-1 5 5-5 5z" fill="white"/></svg></div>
-      <span class="title">Gemini for Word</span>
+      <span class="title">GPT for Word</span>
       <div class="actions">
         <button onclick="newChat()">New</button>
         <button onclick="showSettings()">&#9881;</button>
@@ -141,12 +141,12 @@
 
     <div class="input-area">
       <div class="input-wrapper">
-        <textarea id="user-input" placeholder="Ask Gemini to edit your document..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
+        <textarea id="user-input" placeholder="Ask GPT to edit your document..." rows="1" onkeydown="handleKeyDown(event)" oninput="autoResize(this)"></textarea>
         <button class="send-btn" id="send-btn" onclick="sendMessage()"><svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg></button>
       </div>
       <div class="input-footer">
         <label class="context-toggle"><input type="checkbox" id="include-doc" checked /> Include document</label>
-        <span class="model-info">Gemini 3 Flash</span>
+        <span class="model-info">GPT-4o</span>
       </div>
     </div>
   </div>
@@ -154,7 +154,7 @@
   <script>
     let API_KEY = '', conversationHistory = [], isProcessing = false, officeReady = false;
 
-    const SYSTEM_PROMPT = `You are Gemini, an AI assistant in Microsoft Word. You edit documents directly.
+    const SYSTEM_PROMPT = `You are GPT, an AI assistant in Microsoft Word. You edit documents directly.
 
 When asked to edit/fix/improve/translate text, respond with JSON changes:
 
@@ -186,13 +186,13 @@ For questions (summarize, explain) without editing, respond normally without JSO
 
     Office.onReady(function() {
       officeReady = true;
-      const k = localStorage.getItem('gemini_api_key');
+      const k = localStorage.getItem('openai_api_key');
       if (k) { API_KEY = k; showChatScreen(); }
     });
 
-    function saveApiKey() { const k = document.getElementById('api-key-input').value.trim(); if (!k) return; API_KEY = k; localStorage.setItem('gemini_api_key', k); showChatScreen(); }
+    function saveApiKey() { const k = document.getElementById('api-key-input').value.trim(); if (!k) return; API_KEY = k; localStorage.setItem('openai_api_key', k); showChatScreen(); }
     function showChatScreen() { document.getElementById('setup-screen').style.display = 'none'; document.getElementById('chat-screen').style.display = 'flex'; document.getElementById('user-input').focus(); }
-    function showSettings() { const k = prompt('Enter Google AI API key:'); if (k) { API_KEY = k.trim(); localStorage.setItem('gemini_api_key', API_KEY); } }
+    function showSettings() { const k = prompt('Enter OpenAI API key:'); if (k) { API_KEY = k.trim(); localStorage.setItem('openai_api_key', API_KEY); } }
 
     /* ── Document Operations ── */
     async function getDocumentContent() {
@@ -234,7 +234,7 @@ For questions (summarize, explain) without editing, respond normally without JSO
             if (sr.items.length > 0) { sr.items[0].insertText(replaceText, Word.InsertLocation.replace); await ctx.sync(); resolve(true); return; }
           }
 
-          // Strategy 4: Paragraph-level text replacement (handles Arabic and complex text)
+          // Strategy 4: Paragraph-level text replacement
           try {
             const paragraphs = body.paragraphs;
             paragraphs.load('items'); await ctx.sync();
@@ -251,7 +251,7 @@ For questions (summarize, explain) without editing, respond normally without JSO
             }
           } catch(e) {}
 
-          // Strategy 5: Normalized comparison (remove extra spaces)
+          // Strategy 5: Normalized whitespace comparison
           try {
             const paragraphs = body.paragraphs;
             paragraphs.load('items'); await ctx.sync();
@@ -356,47 +356,36 @@ For questions (summarize, explain) without editing, respond normally without JSO
     }
 
     async function callAPI() {
-      // Build Gemini API contents from conversation history
-      const geminiContents = conversationHistory.map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.content }]
-      }));
+      // Build OpenAI messages array with system prompt
+      const messages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...conversationHistory
+      ];
 
-      const r = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=' + API_KEY, {
+      const r = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + API_KEY
+        },
         body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: SYSTEM_PROMPT }]
-          },
-          contents: geminiContents,
-          generationConfig: {
-            temperature: 1.0,
-            maxOutputTokens: 4096
-          }
+          model: 'gpt-4o',
+          messages: messages,
+          max_tokens: 4096,
+          temperature: 0.7
         })
       });
 
       if (!r.ok) {
         const e = await r.json().catch(() => ({}));
-        if (r.status === 400 && e.error?.message?.includes('API key')) {
-          throw new Error('Invalid API key. Check settings.');
-        }
+        if (r.status === 401) throw new Error('Invalid API key. Check settings.');
+        if (r.status === 429) throw new Error('Rate limit exceeded. Please wait a moment.');
+        if (r.status === 402) throw new Error('Insufficient credits. Add billing at platform.openai.com.');
         throw new Error(e.error?.message || `API error (${r.status})`);
       }
 
       const d = await r.json();
-
-      if (!d.candidates || d.candidates.length === 0) {
-        throw new Error('No response from Gemini. The content may have been blocked.');
-      }
-
-      // Extract text from all parts
-      const parts = d.candidates[0].content?.parts || [];
-      return parts
-        .filter(p => p.text)
-        .map(p => p.text)
-        .join('\n');
+      return d.choices[0].message.content;
     }
 
     /* ── UI ── */
@@ -404,7 +393,7 @@ For questions (summarize, explain) without editing, respond normally without JSO
       const c = document.getElementById('chat-messages'), t = document.getElementById('typing-indicator');
       const msg = document.createElement('div'); msg.className = `message ${role}`;
       msg.innerHTML = `<div class="avatar">${role === 'user' ? 'M' : 'G'}</div>
-        <div class="content"><div class="sender">${role === 'user' ? 'You' : 'Gemini'}</div><div class="text">${formatMD(text)}</div>
+        <div class="content"><div class="sender">${role === 'user' ? 'You' : 'GPT'}</div><div class="text">${formatMD(text)}</div>
         ${actions && role === 'assistant' ? '<div class="message-actions"></div>' : ''}</div>`;
       c.insertBefore(msg, t);
       if (actions && role === 'assistant') {
@@ -430,7 +419,7 @@ For questions (summarize, explain) without editing, respond normally without JSO
       }).join('');
 
       msg.innerHTML = `<div class="avatar">G</div><div class="content">
-        <div class="sender">Gemini</div>
+        <div class="sender">GPT</div>
         ${data.summary ? `<div class="text">${esc(data.summary)}</div>` : ''}
         <div class="changes-preview"><div class="changes-header">${data.changes.length} change${data.changes.length>1?'s':''}</div>${html}</div>
         <div class="message-actions"></div>
@@ -446,7 +435,7 @@ For questions (summarize, explain) without editing, respond normally without JSO
         const res = await applyChangesToDocument(data.changes);
         if (res.applied > 0 && res.failed === 0) addStatus('success', `All ${res.applied} change${res.applied>1?'s':''} applied!`);
         else if (res.applied > 0) addStatus('info', `Applied ${res.applied}, ${res.failed} failed: ${res.failedItems.join(', ')}`);
-        else addStatus('error', 'Could not match text. Try selecting text first or ask Gemini to retry.');
+        else addStatus('error', 'Could not match text. Try selecting text first or ask GPT to retry.');
         ab.textContent = res.applied > 0 ? 'Applied' : 'Failed';
       };
       ad.appendChild(ab);
